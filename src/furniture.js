@@ -319,24 +319,26 @@ function hall(at, b, M) {
 }
 
 function childBedroom(at, b, M) {
-  bed(at(0.74, 2.69, 'n'), M, 1.0, 2.0, M.blanketKids, 1);
-  bedside(at(1.52, 3.49, 'n'), M);
-  desk(at(1.9, 0.51, 's'), M, 1.2, 0.55);
-  chair(at(1.75, 0.98, 'n'), M);
-  at(1.75, 0.98, 'n').solid(-0.21, -0.21, 0.21, 0.21, 'chair');
-  wardrobe(at(3.885, 1.2, 'w'), M, 1.8, 0.6, 2.1, 3);
+  // Wardrobe in the south-west corner, on the west wall.
+  wardrobe(at(0.535, 2.79, 'e'), M, 1.8, 0.6, 2.1, 3);
+  // Bed beside it, head against the south wall; study desk on the east wall.
+  bed(at(2.12, 2.69, 'n'), M, 1.0, 2.0, M.blanketKids, 1);
+  bedside(at(2.9, 3.49, 'n'), M);
+  desk(at(3.91, 1.0, 'w'), M, 1.2, 0.55);
+  chair(at(3.44, 0.83, 'e'), M);
+  at(3.44, 0.83, 'e').solid(-0.21, -0.21, 0.21, 0.21, 'chair');
   bookshelf(at(0.385, 0.95, 'e'), M, 0.9, 0.3, 1.5);
-  b.box(M.rugKids, 1.6, 0.001, 1.7, 3.0, 0.012, 3.1);
+  b.box(M.rugKids, 1.1, 0.001, 0.45, 2.9, 0.012, 1.55);
 }
 
 function masterBedroom(at, b, M) {
+  // Wardrobe in the south-west corner, on the west wall.
+  wardrobe(at(0.535, 9.33, 'e'), M, 2.2, 0.6, 2.1, 4, M.oak);
   // Bed faces north: head against the south wall, feet toward the north.
   // The headboard is kept just under the sill so it does not cover the window.
-  bed(at(1.91, 9.4094, 'n'), M, 1.8, 2.05, M.blanketMaster, 2, 0.88);
-  bedside(at(0.72, 10.235, 'n'), M);
-  bedside(at(3.2, 10.235, 'n'), M);
-  wardrobe(at(3.885, 8.8, 'w'), M, 2.2, 0.6, 2.1, 4, M.oak);
-  b.box(M.rugMaster, 0.75, 0.001, 7.45, 3.05, 0.012, 9.4);
+  bed(at(2.5, 9.4094, 'n'), M, 1.8, 2.05, M.blanketMaster, 2, 0.88);
+  bedside(at(3.67, 10.235, 'n'), M);
+  b.box(M.rugMaster, 1.35, 0.001, 7.45, 3.65, 0.012, 9.4);
 }
 
 function kitchen(at, b, M, colliders) {

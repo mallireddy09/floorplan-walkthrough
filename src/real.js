@@ -242,31 +242,31 @@ function corridor(b, M) {
 }
 
 function childBedroom(b, M, colliders) {
-  // posters over the bed
-  for (const [z0, cell] of [[2.05, [0, 1]], [2.75, [1, 1]]]) {
-    b.box(M.paper, 0.2286, 1.24, z0 - 0.01, 0.2336, 1.96, z0 + 0.56);
-    framed(b, M, 'z', 0.2286, +1, z0, z0 + 0.55, 1.25, 1.95, cell, null, 0.005);
+  // posters over the bed, on the south wall
+  for (const [x0, cell] of [[1.57, [0, 1]], [2.2, [1, 1]]]) {
+    b.box(M.paper, x0 - 0.01, 1.24, 3.6907, x0 + 0.56, 1.96, 3.6957);
+    framed(b, M, 'x', 3.6957, -1, x0, x0 + 0.55, 1.25, 1.95, cell, null, 0.005);
   }
   // teddy on the bed
-  b.sphere(M.brown, 0.55, 0.65, 3.0, 0.1);
-  b.sphere(M.brown, 0.55, 0.79, 3.0, 0.075);
-  b.sphere(M.brown, 0.49, 0.85, 3.0, 0.028);
-  b.sphere(M.brown, 0.61, 0.85, 3.0, 0.028);
-  b.sphere(M.paper, 0.55, 0.78, 2.94, 0.03);
-  // school bag by the desk, ball tucked beside the bookshelf
-  b.rbox(M.blue, 1.05, 0, 0.36, 1.29, 0.4, 0.6, 0.05);
-  b.rbox(M.red, 1.09, 0.05, 0.59, 1.25, 0.22, 0.635, 0.02);
-  colliders.push({ x0: 1.05, z0: 0.36, x1: 1.29, z1: 0.63, tag: 'prop' });
-  b.sphere(M.red, 0.5, 0.11, 1.545, 0.11);
-  // desk: books, pencil pot, notebook
-  [M.bookA, M.bookB, M.bookC].forEach((m, i) => b.box(m, 1.9 + i * 0.01, 0.75 + i * 0.03, 0.52, 2.08 - i * 0.01, 0.78 + i * 0.03, 0.76));
-  b.cyl(M.green, 2.38, 0.75, 0.42, 0.035, 0.09);
-  b.cyl(M.yellow, 2.37, 0.84, 0.42, 0.004, 0.08);
-  b.cyl(M.red, 2.39, 0.84, 0.43, 0.004, 0.07);
-  b.box(M.paper, 1.52, 0.75, 0.63, 1.76, 0.756, 0.77);
+  b.sphere(M.brown, 2.05, 0.65, 3.0, 0.1);
+  b.sphere(M.brown, 2.05, 0.79, 3.0, 0.075);
+  b.sphere(M.brown, 1.99, 0.85, 3.0, 0.028);
+  b.sphere(M.brown, 2.11, 0.85, 3.0, 0.028);
+  b.sphere(M.paper, 2.05, 0.78, 2.94, 0.03);
+  // school bag under the window, ball tucked between the bookshelf and the wardrobe
+  b.rbox(M.blue, 1.25, 0, 0.24, 1.49, 0.4, 0.48, 0.05);
+  b.rbox(M.red, 1.29, 0.05, 0.47, 1.45, 0.22, 0.515, 0.02);
+  colliders.push({ x0: 1.25, z0: 0.24, x1: 1.49, z1: 0.52, tag: 'prop' });
+  b.sphere(M.red, 0.5, 0.11, 1.645, 0.11);
+  // desk on the east wall: books, pencil pot, notebook
+  [M.bookA, M.bookB, M.bookC].forEach((m, i) => b.box(m, 3.86, 0.75 + i * 0.03, 1.4 + i * 0.01, 4.1, 0.78 + i * 0.03, 1.58 - i * 0.01));
+  b.cyl(M.green, 4.1, 0.75, 0.48, 0.035, 0.09);
+  b.cyl(M.yellow, 4.09, 0.84, 0.48, 0.004, 0.08);
+  b.cyl(M.red, 4.11, 0.84, 0.49, 0.004, 0.07);
+  b.box(M.paper, 3.66, 0.75, 0.63, 3.8, 0.756, 0.87);
   // cardigan over the chair back
-  b.rbox(M.pink, 1.56, 0.56, 1.19, 1.94, 0.93, 1.212, 0.01);
-  b.rbox(M.pink, 1.56, 0.9, 1.15, 1.94, 0.93, 1.212, 0.01);
+  b.rbox(M.pink, 3.208, 0.56, 0.64, 3.23, 0.93, 1.02, 0.01);
+  b.rbox(M.pink, 3.208, 0.9, 0.64, 3.27, 0.93, 1.02, 0.01);
   // blocks and a globe on top of the bookshelf
   b.box(M.red, 0.34, 1.5, 0.62, 0.42, 1.58, 0.7);
   b.box(M.yellow, 0.34, 1.5, 0.72, 0.42, 1.58, 0.8);
@@ -276,21 +276,20 @@ function childBedroom(b, M, colliders) {
 }
 
 function masterBedroom(b, M, colliders) {
-  framed(b, M, 'z', 0.2286, +1, 8.05, 9.25, 1.3, 1.95, [2, 0]);
+  // picture on the east wall, now that the wardrobe stands on the west wall
+  framed(b, M, 'z', 4.191, -1, 8.4, 9.6, 1.3, 1.95, [2, 0]);
   // throw across the foot of the bed (the north end), two cushions against the pillows
-  b.rbox(M.throwCloth, 0.995, 0.535, 8.5, 2.825, 0.578, 8.95, 0.015);
-  b.rbox(M.throwCloth, 0.985, 0.3, 8.5, 1.012, 0.565, 8.95, 0.012);
-  b.rbox(M.throwCloth, 2.808, 0.3, 8.5, 2.835, 0.565, 8.95, 0.012);
-  b.rbox(M.mustard, 1.3, 0.545, 9.78, 1.7, 0.9, 9.9, 0.05);
-  b.rbox(M.throwCloth, 2.1, 0.545, 9.78, 2.5, 0.9, 9.9, 0.05);
-  // bedside tables
-  b.box(M.bookB, 0.55, 0.5, 10.07, 0.69, 0.53, 10.2);
-  b.cyl(M.glass, 0.87, 0.5, 10.12, 0.03, 0.1);
-  b.box(M.dark, 3.03, 0.5, 10.08, 3.11, 0.51, 10.18);
-  b.rbox(M.red, 3.3, 0.5, 10.07, 3.38, 0.58, 10.13, 0.01);
+  b.rbox(M.throwCloth, 1.585, 0.535, 8.5, 3.415, 0.578, 8.95, 0.015);
+  b.rbox(M.throwCloth, 1.575, 0.3, 8.5, 1.602, 0.565, 8.95, 0.012);
+  b.rbox(M.throwCloth, 3.398, 0.3, 8.5, 3.425, 0.565, 8.95, 0.012);
+  b.rbox(M.mustard, 1.9, 0.545, 9.78, 2.3, 0.9, 9.9, 0.05);
+  b.rbox(M.throwCloth, 2.7, 0.545, 9.78, 3.1, 0.9, 9.9, 0.05);
+  // bedside table
+  b.box(M.bookB, 3.48, 0.5, 10.07, 3.62, 0.53, 10.2);
+  b.cyl(M.glass, 3.83, 0.5, 10.12, 0.03, 0.1);
   // slippers at the foot of the bed, laundry basket in the corner
-  b.rbox(M.blue, 1.25, 0.001, 8.12, 1.35, 0.04, 8.38, 0.02);
-  b.rbox(M.blue, 1.39, 0.001, 8.12, 1.49, 0.04, 8.38, 0.02);
+  b.rbox(M.blue, 1.85, 0.001, 8.12, 1.95, 0.04, 8.38, 0.02);
+  b.rbox(M.blue, 1.99, 0.001, 8.12, 2.09, 0.04, 8.38, 0.02);
   b.cyl(M.basket, 0.44, 0, 7.02, 0.16, 0.45, 0.2, 16);
   b.sphere(M.towel, 0.44, 0.45, 7.02, 0.17, 1, 0.5, 1);
   colliders.push({ x0: 0.24, z0: 6.8, x1: 0.65, z1: 7.23, tag: 'prop' });
