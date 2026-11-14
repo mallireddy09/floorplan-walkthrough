@@ -83,7 +83,50 @@ export function buildHouse(plan, M, { real = false, extras = null } = {}) {
   }
 
   // ---------- ceiling ----------
-  up.box(M.ceiling, fp.x0, H.ceiling, fp.z0, fp.x1, H.ceiling + H.slab, fp.z1);
+  // The roof slab reaches past the walls where the terrace is extended. North of the
+  // house wall it starts east of the outside staircase, leaving the stair open to the sky.
+  const T = plan.terrace;
+  const ext = T?.extend ?? { north: 0, east: 0, south: 0, west: 0 };
+  const slab = { x0: fp.x0 - ext.west, x1: fp.x1 + ext.east, z0: fp.z0 - ext.north, z1: fp.z1 + ext.south };
+  const wellTo = T?.stairWell?.to ?? fp.x0; // the slab's north part begins here
+  up.box(M.ceiling, slab.x0, H.ceiling, fp.z0, slab.x1, H.ceiling + H.slab, slab.z1);
+  if (ext.north > 0) up.box(M.ceiling, wellTo, H.ceiling, slab.z0, slab.x1, H.ceiling + H.slab, fp.z0);
+
+  // ---------- tiles on the ground around the house, under the overhang ----------
+  // Four strips that together match the outline of the slab outside the walls.
+  if (T?.groundTiles) {
+    const y = -0.008;
+    const uv = 1 / (T.groundTiles.size * 2); // the texture holds two tiles each way
+    const strip = (x0, z0, x1, z1) => {
+      if (x1 - x0 > 0.01 && z1 - z0 > 0.01) main.add(M.apron, floorQuad(x0, z0, x1, z1, y, uv));
+    };
+    strip(wellTo, slab.z0, slab.x1, fp.z0); // north, east of the staircase
+    strip(fp.x1, fp.z0, slab.x1, slab.z1); // east
+    strip(slab.x0, fp.z1, fp.x1, slab.z1); // south
+    strip(slab.x0, fp.z0, fp.x0, fp.z1); // west
+  }
+
+  // ---------- terrace safety wall (parapet) ----------
+  // A wall all round the edge of the slab, open only where the outside staircase
+  // arrives. It sits with the ceiling, so it comes off with it in the top view.
+  if (T) {
+    const y0 = H.ceiling + H.slab;
+    const y1 = y0 + T.parapet;
+    const t = T.parapetThickness;
+    const run = (x0, z0, x1, z1) => {
+      if (x1 - x0 < 0.02 || z1 - z0 < 0.02) return;
+      up.box(M.wall, x0, y0, z0, x1, y1, z1);
+      up.box(M.concrete, x0 - 0.02, y1, z0 - 0.02, x1 + 0.02, y1 + 0.04, z1 + 0.02); // coping
+    };
+    // along the house's north wall line, beside the stair: open at the access
+    run(slab.x0, fp.z0, T.access.from, fp.z0 + t);
+    run(T.access.to, fp.z0, wellTo, fp.z0 + t);
+    if (ext.north > 0) run(wellTo, slab.z0, slab.x1, slab.z0 + t); // north edge, east of the stair
+    else run(wellTo, fp.z0, slab.x1, fp.z0 + t);
+    run(slab.x0, slab.z1 - t, slab.x1, slab.z1); // south
+    run(slab.x0, fp.z0 + t, slab.x0 + t, slab.z1 - t); // west
+    run(slab.x1 - t, slab.z0 + t, slab.x1, slab.z1 - t); // east
+  }
 
   // ---------- ceiling lights and fans ----------
   const fittings = {
@@ -299,4 +342,32 @@ function buildOutside(plan, M, batch, colliders) {
     batch.box(M.concrete, x0, yTop - 0.3, s.z0, x0 + run, yTop, s.z1 - 0.03);
   }
   colliders.push({ x0: s.x0, z0: s.z0, x1: s.x1, z1: s.z1, tag: 'stair' });
+
+  // Safety on the staircase: a wall on its open (north) side that steps up with the
+  // treads, a wall across the high end and the landing's west end, and a handrail on
+  // the house side. You step on at the landing from the north.
+  if (s.sideWall) {
+    const wt = 0.1;
+    const hgt = s.sideWall;
+    // The walls stand just outside the edge of the steps, so they do not share a face with them.
+    batch.box(M.wall, s.x0 - wt, -0.03, s.z0 - wt, s.x0, rise + hgt, s.z1 - 0.03); // landing, west end
+    for (let i = 0; i < n; i++) {
+      const x0 = s.landingTo + i * run;
+      const yTop = (i + 2) * rise;
+      batch.box(M.wall, x0, yTop - 0.3, s.z0 - wt, x0 + run, yTop + hgt, s.z0); // open side
+    }
+    batch.box(M.wall, s.x1, top - 0.3, s.z0 - wt, s.x1 + wt, top + 1.0, s.z1 - 0.03); // across the high end
+    colliders.push({ x0: s.landingTo, z0: s.z0 - wt, x1: s.x1 + wt, z1: s.z0, tag: 'stair' });
+    colliders.push({ x0: s.x0 - wt, z0: s.z0 - wt, x1: s.x0, z1: s.z1, tag: 'stair' });
+    // handrail along the house wall, following the slope of the treads
+    const railEnd = plan.terrace ? plan.terrace.access.from : s.x1 - run;
+    const a = new THREE.Vector3(s.landingTo, 2 * rise + 0.85, s.z1 - 0.1);
+    const b2 = new THREE.Vector3(railEnd, 2 * rise + ((railEnd - s.landingTo) / run) * rise + 0.85, s.z1 - 0.1);
+    const d = b2.clone().sub(a);
+    const rail = new THREE.CylinderGeometry(0.02, 0.02, d.length(), 10);
+    rail.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.clone().normalize()));
+    rail.translate((a.x + b2.x) / 2, (a.y + b2.y) / 2, (a.z + b2.z) / 2);
+    batch.add(M.steel, rail);
+    for (const p of [a, a.clone().lerp(b2, 0.5), b2]) batch.box(M.steel, p.x - 0.015, p.y - 0.015, p.z, p.x + 0.015, p.y + 0.015, s.z1 - 0.03); // brackets to the wall
+  }
 }

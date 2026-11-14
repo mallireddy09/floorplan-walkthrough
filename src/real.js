@@ -47,7 +47,7 @@ function insideFace(plan, wallId) {
 
 // ------------------------------------------------------------------ shell
 
-/** Feature walls, curtains, blinds, switch plates, the dining pendant, and the outdoors. */
+/** Feature walls, curtains, blinds, switch plates, and the outdoors. */
 export function realShell(plan, M, { main, up, colliders }) {
   const room = (id) => plan.rooms.find((r) => r.id === id);
   const win = (id) => plan.windows.find((w) => w.id === id);
@@ -61,7 +61,7 @@ export function realShell(plan, M, { main, up, colliders }) {
   const curtains = [
     ['hallE2', M.curtainHall, 0.86], // stops above the sofa back
     ['hallN1', M.curtainHall, 0.1],
-    ['cbedN', M.curtainKids, 0.1],
+    ['cbedW', M.curtainKids, 0.1],
     ['mbedS', M.curtainMaster, 0.92], // stops above the headboard
   ];
   for (const [id, mat, drop] of curtains) {
@@ -88,11 +88,6 @@ export function realShell(plan, M, { main, up, colliders }) {
   plate('z', 4.3053, +1, 9.75); // kitchen, by the south door
   plate('z', 2.4765, +1, 4.88); // lobby, for Toilet 1
   plate('z', 4.3053, +1, 5.08); // passage
-
-  // pendant lamp over the dining table (kept with the ceiling so the top view stays clear)
-  up.cyl(M.dark, 5.1, 1.78, 1.53, 0.005, 1.22);
-  up.cyl(M.dark, 5.1, 1.58, 1.53, 0.2, 0.2, 0.06, 20);
-  up.cyl(M.bulb, 5.1, 1.572, 1.53, 0.07, 0.012, 0.07, 16);
 
   outdoors(plan, M, main, colliders);
 }
@@ -202,16 +197,6 @@ function hall(b, M) {
   b.rbox(M.throwCloth, 6.93, 0.612, 4.57, 7.5, 0.65, 4.765, 0.015);
   b.rbox(M.throwCloth, 6.915, 0.3, 4.57, 6.945, 0.65, 4.765, 0.012);
 
-  // dining table laid for four
-  for (const x of [4.8, 5.4]) {
-    for (const z of [1.31, 1.75]) {
-      b.box(M.mat, x - 0.19, 0.76, z - 0.14, x + 0.19, 0.764, z + 0.14);
-      b.cyl(M.ceramic, x, 0.764, z, 0.07, 0.014, 0.105, 20);
-      b.cyl(M.steel, x + 0.15, 0.764, z + (z < 1.5 ? 0.08 : -0.08), 0.03, 0.1, 0.035);
-    }
-  }
-  b.cyl(M.steel, 5.42, 0.76, 1.53, 0.055, 0.2, 0.045);
-
   // floor lamp in the corner beside the sofa
   b.cyl(M.dark, 7.63, 0, 4.895, 0.125, 0.02);
   b.cyl(M.dark, 7.63, 0.02, 4.895, 0.012, 1.42);
@@ -253,11 +238,11 @@ function childBedroom(b, M, colliders) {
   b.sphere(M.brown, 1.99, 0.85, 3.0, 0.028);
   b.sphere(M.brown, 2.11, 0.85, 3.0, 0.028);
   b.sphere(M.paper, 2.05, 0.78, 2.94, 0.03);
-  // school bag under the window, ball tucked between the bookshelf and the wardrobe
-  b.rbox(M.blue, 1.25, 0, 0.24, 1.49, 0.4, 0.48, 0.05);
-  b.rbox(M.red, 1.29, 0.05, 0.47, 1.45, 0.22, 0.515, 0.02);
-  colliders.push({ x0: 1.25, z0: 0.24, x1: 1.49, z1: 0.52, tag: 'prop' });
-  b.sphere(M.red, 0.5, 0.11, 1.645, 0.11);
+  // school bag beside the bookshelf, ball tucked in the corner behind it
+  b.rbox(M.blue, 1.68, 0, 0.24, 1.92, 0.4, 0.48, 0.05);
+  b.rbox(M.red, 1.72, 0.05, 0.47, 1.88, 0.22, 0.515, 0.02);
+  colliders.push({ x0: 1.68, z0: 0.24, x1: 1.92, z1: 0.52, tag: 'prop' });
+  b.sphere(M.red, 0.47, 0.11, 0.4, 0.11);
   // desk on the east wall: books, pencil pot, notebook
   [M.bookA, M.bookB, M.bookC].forEach((m, i) => b.box(m, 3.86, 0.75 + i * 0.03, 1.4 + i * 0.01, 4.1, 0.78 + i * 0.03, 1.58 - i * 0.01));
   b.cyl(M.green, 4.1, 0.75, 0.48, 0.035, 0.09);
@@ -268,11 +253,11 @@ function childBedroom(b, M, colliders) {
   b.rbox(M.pink, 3.208, 0.56, 0.64, 3.23, 0.93, 1.02, 0.01);
   b.rbox(M.pink, 3.208, 0.9, 0.64, 3.27, 0.93, 1.02, 0.01);
   // blocks and a globe on top of the bookshelf
-  b.box(M.red, 0.34, 1.5, 0.62, 0.42, 1.58, 0.7);
-  b.box(M.yellow, 0.34, 1.5, 0.72, 0.42, 1.58, 0.8);
-  b.box(M.blue, 0.345, 1.58, 0.67, 0.425, 1.66, 0.75);
-  b.cyl(M.dark, 0.39, 1.5, 1.2, 0.05, 0.03);
-  b.sphere(M.blue, 0.39, 1.62, 1.2, 0.09);
+  b.box(M.red, 0.82, 1.5, 0.34, 0.9, 1.58, 0.42);
+  b.box(M.yellow, 0.92, 1.5, 0.34, 1.0, 1.58, 0.42);
+  b.box(M.blue, 0.87, 1.58, 0.345, 0.95, 1.66, 0.425);
+  b.cyl(M.dark, 1.4, 1.5, 0.39, 0.05, 0.03);
+  b.sphere(M.blue, 1.4, 1.62, 0.39, 0.09);
 }
 
 function masterBedroom(b, M, colliders) {

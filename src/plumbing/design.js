@@ -203,7 +203,12 @@ fall({ ...rainPipe, dia: 160, id: 'rain-out', name: 'Rainwater outlet', purpose:
 labels.push({ text: 'To storm drain', layer: 'rain', at: [10.0, 0.2, 12.35], small: true });
 
 // Roof edge, roof outlets and the direction rain runs on the roof and yard.
-export const roofOutline = { x0: 0, z0: 0, x1: 8.0772, z1: 10.668, y: ROOF };
+// Edge of the roof slab: 6 ft beyond the walls on the north and east, 3 ft on the south
+// and west, starting east of the outside staircase on the north side.
+export const roofOutline = {
+  y: ROOF,
+  points: [[3.3, -1.8288], [9.906, -1.8288], [9.906, 11.5824], [-0.9144, 11.5824], [-0.9144, 0], [3.3, 0], [3.3, -1.8288]],
+};
 export const surfaceFlows = [
   // on the roof: toward the four outlets
   { from: [2.0, ROOF + 0.03, 8.4], to: [0.4, ROOF + 0.03, 10.2] },

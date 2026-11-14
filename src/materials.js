@@ -185,6 +185,8 @@ export function createMaterials(renderer) {
     bathFloorWet: std({ map: bathFloor, color: 0x5f7480, roughness: 0.95 }),
     bathWallWet: std({ map: bathWall, color: 0x7fa3b3, roughness: 0.35, envMapIntensity: 0.45 }),
     kerb: std({ color: 0x34383b, roughness: 0.35 }),
+    // outdoor tiles on the ground around the house, under the roof overhang
+    apron: std({ map: bathFloor, color: 0xd9c3a3, roughness: 0.9 }),
     splash: std({ color: 0xe6e2d8, roughness: 0.3 }),
     door: std({ map: wood, color: 0x9a653a, roughness: 0.55 }),
     doorFrame: std({ map: wood, color: 0x7a4c28, roughness: 0.6 }),

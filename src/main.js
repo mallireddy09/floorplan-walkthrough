@@ -57,7 +57,7 @@ const camera = new THREE.PerspectiveCamera(70, 1, 0.05, 150);
 camera.rotation.order = 'YXZ';
 
 const topCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 80);
-const topView = { x0: -0.9, x1: 9.0, z0: -2.3, z1: 11.2 }; // house, outside stair and a margin
+const topView = { x0: -1.3, x1: 10.3, z0: -2.3, z1: 11.95 }; // house, outside stair, the tiled strip round it and a margin
 topCam.position.set((topView.x0 + topView.x1) / 2, 40, (topView.z0 + topView.z1) / 2);
 topCam.up.set(0, 0, -1); // north at the top of the screen, as on the plan
 topCam.lookAt(topCam.position.x, 0, topCam.position.z);

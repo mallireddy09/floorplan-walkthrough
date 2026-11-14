@@ -229,7 +229,7 @@ export function buildPlumbing({ compact = false } = {}) {
   // ---------------- roof edge, and which way rain runs on the roof and the yard
   {
     const o = roofOutline;
-    const pts = [[o.x0, o.z0], [o.x1, o.z0], [o.x1, o.z1], [o.x0, o.z1], [o.x0, o.z0]].map(([x, z]) => new THREE.Vector3(x, o.y, z));
+    const pts = o.points.map(([x, z]) => new THREE.Vector3(x, o.y, z));
     layers.rain.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: LAYERS.rain.color })));
     const geos = [];
     const light = new THREE.MeshLambertMaterial({ color: 0x7fd197 });

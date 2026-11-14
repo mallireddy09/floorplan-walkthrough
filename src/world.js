@@ -35,7 +35,7 @@ export function buildWorld(plan, renderer, style) {
   const ghostFor = new Map([
     [M.wall, ghost.wall], [M.compound, ghost.wall], [M.concrete, ghost.wall],
     [M.floor, ghost.floor], [M.bathFloor, ghost.floor], [M.bathFloorWet, ghost.floor],
-    [M.lawn, ghost.yard], [M.paving, ghost.yard], [M.ground, ghost.road],
+    [M.lawn, ghost.yard], [M.paving, ghost.yard], [M.apron, ghost.yard], [M.ground, ghost.road],
   ]);
   let edges = null;
 

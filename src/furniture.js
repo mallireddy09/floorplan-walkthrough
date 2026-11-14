@@ -154,17 +154,6 @@ function chair(p, M) {
   p.box(M.walnut, -s, 0.66, -s, s, 0.9, -s + 0.03);
 }
 
-function diningTable(p, M, w = 1.2, d = 0.8) {
-  const hw = w / 2;
-  const hd = d / 2;
-  p.box(M.oak, -hw, 0.72, -hd, hw, 0.76, hd);
-  p.box(M.oak, -hw + 0.08, 0.64, -hd + 0.08, hw - 0.08, 0.72, hd - 0.08);
-  for (const sx of [-1, 1]) for (const sz of [-1, 1]) p.box(M.oak, sx * (hw - 0.05), 0, sz * (hd - 0.05), sx * (hw - 0.11), 0.72, sz * (hd - 0.11));
-  p.cyl(M.ceramic, 0, 0.76, 0, 0.13, 0.05, 0.16);
-  p.sphere(M.saffron, -0.04, 0.82, 0.02, 0.045);
-  p.sphere(M.mustard, 0.05, 0.82, -0.03, 0.045);
-}
-
 function bed(p, M, w, d, blanket, pillows, headboard = 1.05) {
   const hw = w / 2;
   const hd = d / 2;
@@ -301,14 +290,6 @@ function shower(p, M) {
 // ------------------------------------------------------------------ rooms
 
 function hall(at, b, M) {
-  // Dining for four by the north window, clear of the entrance.
-  diningTable(at(5.1, 1.53, 's'), M, 1.2, 0.8);
-  chair(at(4.8, 1.02, 's'), M);
-  chair(at(5.4, 1.02, 's'), M);
-  chair(at(4.8, 2.04, 'n'), M);
-  chair(at(5.4, 2.04, 'n'), M);
-  at(5.1, 1.53, 's').solid(-0.6, -0.72, 0.6, 0.72, 'dining set');
-
   // Seating: sofa under the east window facing the television on the centre wall.
   sofa(at(7.39, 3.7, 'w'), M, 2.1, 0.9);
   coffeeTable(at(6.2, 3.7, 'w'), M, 1.0, 0.5);
@@ -327,8 +308,8 @@ function childBedroom(at, b, M) {
   desk(at(3.91, 1.0, 'w'), M, 1.2, 0.55);
   chair(at(3.44, 0.83, 'e'), M);
   at(3.44, 0.83, 'e').solid(-0.21, -0.21, 0.21, 0.21, 'chair');
-  bookshelf(at(0.385, 0.95, 'e'), M, 0.9, 0.3, 1.5);
-  b.box(M.rugKids, 1.1, 0.001, 0.45, 2.9, 0.012, 1.55);
+  bookshelf(at(1.15, 0.385, 's'), M, 0.9, 0.3, 1.5); // on the north wall, clear of the west window
+  b.box(M.rugKids, 1.1, 0.001, 0.7, 2.9, 0.012, 1.8);
 }
 
 function masterBedroom(at, b, M) {
