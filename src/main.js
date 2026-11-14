@@ -22,6 +22,9 @@ const toggleEl = document.getElementById('toggle');
 const styleEl = document.getElementById('style');
 const timeEl = document.getElementById('time');
 const plumbEl = document.getElementById('plumb');
+const menuEl = document.getElementById('menu');
+const buttonsEl = document.getElementById('buttons');
+const enterEl = document.getElementById('enter');
 
 const isTouch = window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
 if (isTouch) document.body.classList.add('touch');
@@ -232,12 +235,102 @@ plumbEl.addEventListener('click', () => {
 controls.yaw = -THREE.MathUtils.degToRad(plan.start.heading); // heading is clockwise from north
 controls.pitch = 0;
 
-hintEl.textContent = isTouch ? 'Move: joystick · Look: drag' : 'Move: W A S D, arrow keys or scroll · Look: drag';
-controls.onFirstInput = () => {
-  window.setTimeout(() => {
+// The hint appears once you are inside, and clears itself.
+function showHint() {
+  hintEl.textContent = isTouch ? 'Move: joystick · Look: drag' : 'Move: W A S D, arrow keys or scroll · Look: drag';
+  const clear = () => {
     hintEl.textContent = '';
-  }, 2500);
-};
+  };
+  window.setTimeout(clear, 7000);
+  controls.onFirstInput = () => window.setTimeout(clear, 2500);
+}
+
+// On a phone the four view buttons fold into one Menu button.
+menuEl.addEventListener('click', () => {
+  const open = buttonsEl.classList.toggle('open');
+  menuEl.setAttribute('aria-expanded', String(open));
+  menuEl.textContent = open ? 'Close' : 'Menu';
+  menuEl.blur();
+});
+document.getElementById('button-list').addEventListener('click', () => {
+  buttonsEl.classList.remove('open');
+  menuEl.setAttribute('aria-expanded', 'false');
+  menuEl.textContent = 'Menu';
+});
+
+// ---------------------------------------------------------------- opening view
+// The page opens on the whole house, seen from outside and slowly turning.
+// "Enter" walks the camera down to the main entrance and in through the door,
+// and the normal walking view takes over from there.
+const introCam = new THREE.PerspectiveCamera(50, 1, 0.1, 300);
+const intro = { active: true, flying: false, start: performance.now(), t0: 0, from: null };
+const HOUSE_MID = new THREE.Vector3(4.04, 1.0, 5.33);
+const DOOR_OUT = new THREE.Vector3(plan.start.x, 1.7, -4.2); // on the path outside the main door
+const DOOR_IN = new THREE.Vector3(plan.start.x, EYE, plan.start.z); // where the walk begins
+const LOOK_DOOR = new THREE.Vector3(plan.start.x, 1.5, 3.0);
+const LOOK_IN = new THREE.Vector3(plan.start.x, EYE, 6.0); // straight ahead, due south
+const ease = (t) => t * t * (3 - 2 * t);
+document.body.classList.add('intro');
+controls.enabled = false;
+
+function updateIntro(now) {
+  if (!intro.flying) {
+    // slow turn around the house, starting north-east of it so the entrance side shows first
+    const back = Math.min(1.9, Math.max(1, 1.15 / introCam.aspect)); // stand further back on an upright phone
+    const r = 19 * back;
+    const a = THREE.MathUtils.degToRad(38) + ((now - intro.start) / 1000) * ((Math.PI * 2) / 70);
+    introCam.position.set(HOUSE_MID.x + r * Math.sin(a), 11.5 * back, HOUSE_MID.z - r * Math.cos(a));
+    introCam.lookAt(HOUSE_MID);
+    return;
+  }
+  const t = (now - intro.t0) / 1000;
+  const d1 = 2.4; // down to the door
+  const d2 = 1.9; // in through it
+  const look = new THREE.Vector3();
+  if (t < d1) {
+    const k = ease(t / d1);
+    introCam.position.lerpVectors(intro.from, DOOR_OUT, k);
+    look.lerpVectors(HOUSE_MID, LOOK_DOOR, k);
+    introCam.fov = THREE.MathUtils.lerp(50, camera.fov, k);
+  } else {
+    const k = ease(Math.min(1, (t - d1) / d2));
+    introCam.position.lerpVectors(DOOR_OUT, DOOR_IN, k);
+    look.lerpVectors(LOOK_DOOR, LOOK_IN, k);
+    introCam.fov = camera.fov;
+  }
+  introCam.updateProjectionMatrix();
+  introCam.lookAt(look);
+  if (t >= d1 + d2) finishIntro();
+}
+
+function finishIntro() {
+  intro.active = false;
+  intro.flying = false;
+  document.body.classList.remove('intro', 'entering');
+  pos.x = plan.start.x;
+  pos.z = plan.start.z;
+  controls.yaw = -THREE.MathUtils.degToRad(plan.start.heading);
+  controls.pitch = 0;
+  controls.enabled = true;
+  controls.changed = true;
+  showHint();
+}
+
+function enterHouse(instant = false) {
+  if (!intro.active || intro.flying) return;
+  if (instant) {
+    finishIntro();
+    return;
+  }
+  intro.flying = true;
+  intro.t0 = performance.now();
+  intro.from = introCam.position.clone();
+  document.body.classList.add('entering');
+}
+enterEl.addEventListener('click', () => enterHouse());
+window.addEventListener('keydown', (e) => {
+  if (e.code === 'Enter' && intro.active) enterHouse();
+});
 
 const minimap = new MiniMap(document.getElementById('map'), plan);
 let lastRoom = '';
@@ -254,6 +347,8 @@ function resize() {
   camera.fov = Math.max(63, Math.min(92, wide));
   camera.updateProjectionMatrix();
   plumbing.resize(aspect);
+  introCam.aspect = aspect;
+  introCam.updateProjectionMatrix();
 
   const vw = topView.x1 - topView.x0;
   const vh = topView.z1 - topView.z0;
@@ -289,6 +384,10 @@ function syncView() {
 }
 
 function draw() {
+  if (intro.active) {
+    renderer.render(scene, introCam);
+    return;
+  }
   if (plumbing.active) {
     renderer.render(scene, plumbing.camera);
     return;
@@ -331,7 +430,10 @@ function frame(now) {
   const dt = Math.min(elapsed, 0.05);
   last = now;
 
-  if (plumbing.active) {
+  if (intro.active) {
+    updateIntro(now);
+    needsRender = true;
+  } else if (plumbing.active) {
     plumbing.update(); // eases the turn to a stop; asks for a redraw itself
   } else if (tick(dt)) {
     // If the device is struggling while walking, render fewer pixels.
@@ -373,6 +475,8 @@ window.__walk = {
     controls.changed = true;
   },
   top: setTop,
+  enter: enterHouse,
+  intro,
   look: setLook,
   state: () => ({ x: pos.x, z: pos.z, room: lastRoom, ...state, pixelRatio, calls: renderer.info.render.calls, triangles: renderer.info.render.triangles }),
   get colliders() {

@@ -74,6 +74,57 @@ body {
   gap: 8px;
 }
 
+#button-list {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+/* On a computer all the buttons show; the Menu button is for phones. */
+#menu {
+  display: none;
+}
+
+/* Opening view: only the Enter button shows until you go in. */
+#enter {
+  position: fixed;
+  left: 50%;
+  bottom: calc(28px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  display: none;
+  border: 0;
+  border-radius: 12px;
+  padding: 14px 34px;
+  min-height: 48px;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 600;
+  color: #16181b;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#enter:focus-visible {
+  outline: 2px solid #16181b;
+  outline-offset: 2px;
+}
+
+body.intro #enter {
+  display: block;
+}
+
+body.intro.entering #enter,
+body.intro #room,
+body.intro #mapbox,
+body.intro #hint,
+body.intro #stick,
+body.intro #buttons {
+  display: none;
+}
+
 #buttons button {
   position: static;
   border: 0;
@@ -144,25 +195,57 @@ body.touch #stick {
   display: block;
 }
 
-/* Phones and small windows */
+/* Phones and small windows: a lighter layout that leaves the view clear */
 @media (max-width: 640px), (max-height: 480px) {
   #room {
-    font-size: 15px;
-    padding: 7px 12px;
+    font-size: 14px;
+    padding: 6px 11px;
+    background: rgba(22, 24, 27, 0.6);
   }
   #map {
-    width: 96px;
-    height: 127px;
+    width: 78px;
+    height: 103px;
   }
   #mapbox {
-    padding: 5px;
+    padding: 4px;
+    background: rgba(22, 24, 27, 0.55);
   }
   #hint {
     font-size: 12px;
-    bottom: auto;
-    top: calc(56px + env(safe-area-inset-top));
-    left: calc(12px + env(safe-area-inset-left));
-    transform: none;
+    bottom: calc(150px + env(safe-area-inset-bottom));
+  }
+  /* one Menu button; the four options fold out above it only when asked for */
+  #menu {
+    display: block;
+  }
+  #button-list {
+    display: none;
+  }
+  #buttons.open #button-list,
+  body.plumbing #button-list {
+    display: flex;
+  }
+  body.plumbing #menu {
+    display: none;
+  }
+  #buttons button {
+    min-height: 42px;
+    min-width: 0;
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+  #stick {
+    width: 104px;
+    height: 104px;
+    left: calc(16px + env(safe-area-inset-left));
+    bottom: calc(20px + env(safe-area-inset-bottom));
+    background: rgba(22, 24, 27, 0.3);
+    border-color: rgba(255, 255, 255, 0.45);
+  }
+  #knob {
+    width: 44px;
+    height: 44px;
+    margin: -22px 0 0 -22px;
   }
 }
 
@@ -398,4 +481,9 @@ body.plumbing #toggle {
     bottom: calc(72px + env(safe-area-inset-bottom));
     max-height: 34vh;
   }
+}
+
+/* Kept last so it wins over the rule that shows the joystick on touch screens. */
+body.intro #stick {
+  display: none;
 }

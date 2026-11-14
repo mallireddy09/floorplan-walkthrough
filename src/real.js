@@ -120,9 +120,10 @@ function potted(b, M, colliders, x, z) {
 function outdoors(plan, M, b, colliders) {
   const p = plan.plot;
 
-  // paved paths: from the gate up the east side, across the north front to the main door,
-  // and a small landing outside the kitchen door
+  // paved paths: from the walk gate up the east side, across the north front to the main
+  // door, a small landing outside the kitchen door, and a drive in from the main gate
   b.add(M.paving, floorQuad(9.4, -1.9, 12.7, p.z1, -0.012, 1 / 1.1));
+  b.add(M.paving, floorQuad(12.7, 4.6, 15.4, p.z1, -0.012, 1 / 1.1));
   b.add(M.paving, floorQuad(3.3, -1.9, 9.4, -0.02, -0.012, 1 / 1.1));
   b.add(M.paving, floorQuad(4.3, 10.69, 6.1, p.z1, -0.012, 1 / 1.1));
   b.add(M.paving, floorQuad(8.1, 0.45, 9.4, 2.45, -0.012, 1 / 1.1)); // outside the Hall's east door
@@ -132,7 +133,7 @@ function outdoors(plan, M, b, colliders) {
 
   // trees in the yard and beyond the compound wall
   tree(b, M, colliders, 14.2, 2.2, 1.0);
-  tree(b, M, colliders, 15.3, 9.6, 0.85);
+  tree(b, M, colliders, 16.4, 8.6, 0.8); // beside the drive, clear of the main gate
   tree(b, M, colliders, 11.4, -4.6, 0.9);
   tree(b, M, colliders, 20.5, -1.5, 1.15);
   tree(b, M, colliders, 21.5, 9.0, 1.0);
@@ -140,15 +141,15 @@ function outdoors(plan, M, b, colliders) {
   tree(b, M, colliders, -6.5, 15.0, 1.0);
   tree(b, M, colliders, 16.0, 16.5, 1.1);
 
-  // washing line in the east yard
-  for (const x of [13.6, 16.6]) b.cyl(M.gate, x, -0.03, 6.0, 0.03, 2.0);
-  b.box(M.dark, 13.6, 1.9, 5.996, 16.6, 1.906, 6.004);
+  // washing line along the east boundary, clear of the drive
+  for (const z of [3.4, 6.4]) b.cyl(M.gate, 16.5, -0.03, z, 0.03, 2.0);
+  b.box(M.dark, 16.496, 1.9, 3.4, 16.504, 1.906, 6.4);
   const wash = [M.towel, M.blue, M.throwCloth, M.sheet, M.yellow];
   wash.forEach((m, i) => {
-    const x = 13.95 + i * 0.52;
-    b.box(m, x, 1.9 - (0.55 + (i % 2) * 0.25), 5.99, x + 0.42, 1.905, 6.01);
+    const z = 3.75 + i * 0.52;
+    b.box(m, 16.49, 1.9 - (0.55 + (i % 2) * 0.25), z, 16.51, 1.905, z + 0.42);
   });
-  colliders.push({ x0: 13.55, z0: 5.95, x1: 16.65, z1: 6.05, tag: 'outdoor' });
+  colliders.push({ x0: 16.45, z0: 3.35, x1: 16.55, z1: 6.45, tag: 'outdoor' });
 
   // neighbouring houses beyond the compound wall
   const house = (x0, z0, x1, z1, h) => {
@@ -165,9 +166,8 @@ function outdoors(plan, M, b, colliders) {
   b.cyl(M.gate, 6.2, -0.08, p.z1 + 1.6, 0.06, 5.0);
   b.box(M.gate, 6.17, 4.86, p.z1 + 0.9, 6.23, 4.92, p.z1 + 1.6);
   b.box(M.streetLamp, 6.05, 4.78, p.z1 + 0.75, 6.35, 4.86, p.z1 + 1.05);
-  for (const x of [p.gate.from - 0.08, p.gate.to + 0.08]) {
-    b.box(M.compound, x - 0.12, 1.5, p.z1 - 0.02, x + 0.12, 1.7, p.z1 + 0.17);
-    b.sphere(M.streetLamp, x, 1.8, p.z1 + 0.075, 0.1);
+  for (const g of p.gates) {
+    for (const x of [g.from - 0.1, g.to + 0.1]) b.sphere(M.streetLamp, x, 1.79, p.z1 + 0.075, 0.1);
   }
 }
 

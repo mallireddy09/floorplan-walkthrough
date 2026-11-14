@@ -13,7 +13,11 @@
   "footprint": { "x0": 0, "z0": 0, "x1": 8.0772, "z1": 10.668 },
   "plot": {
     "x0": -1.3335, "z0": -6.4135, "x1": 17.2593, "z1": 12.0015,
-    "gate": { "side": "south", "from": 10.0, "to": 12.4 }
+    "gates_note": "Both gates are on the south (main road) side; from/to are x positions along that boundary. The plan draws one gate at x 10.0-12.4. On request the main gate was moved 2.8 m toward the south-east corner and a walk gate was added near the old position.",
+    "gates": [
+      { "id": "main", "name": "Main gate", "from": 12.8, "to": 15.2, "leaves": 2 },
+      { "id": "walk", "name": "Walk gate", "from": 10.4, "to": 11.4, "leaves": 1, "notOnPlan": true }
+    ]
   },
   "stair": { "x0": 0, "z0": -1.8288, "x1": 3.2, "z1": 0, "landingTo": 0.85, "rises": "east" },
   "start": { "x": 6.5, "z": 1.0, "heading": 180, "note": "Just inside the main entrance (north double door), facing south into the Hall" },

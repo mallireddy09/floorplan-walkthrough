@@ -259,7 +259,7 @@ function buildOutside(plan, M, batch, colliders) {
   // plinth skirt so the floor edge reads as a slab from outside
   batch.box(M.concrete, fp.x0 - 0.02, -0.08, fp.z0 - 0.02, fp.x1 + 0.02, -0.002, fp.z1 + 0.02);
 
-  // compound wall with a gate on the main road side
+  // compound wall, with the gates on the main road side
   const t = 0.15;
   const h = 1.5;
   const wall = (x0, z0, x1, z1) => {
@@ -269,12 +269,22 @@ function buildOutside(plan, M, batch, colliders) {
   wall(p.x0 - t, p.z0 - t, p.x1 + t, p.z0); // north
   wall(p.x0 - t, p.z0, p.x0, p.z1); // west
   wall(p.x1, p.z0, p.x1 + t, p.z1); // east
-  wall(p.x0 - t, p.z1, p.gate.from, p.z1 + t); // south, west of gate
-  wall(p.gate.to, p.z1, p.x1 + t, p.z1 + t); // south, east of gate
-  const mid = (p.gate.from + p.gate.to) / 2;
-  batch.box(M.gate, p.gate.from + 0.02, 0.05, p.z1 + 0.04, mid - 0.01, h - 0.1, p.z1 + 0.09);
-  batch.box(M.gate, mid + 0.01, 0.05, p.z1 + 0.04, p.gate.to - 0.02, h - 0.1, p.z1 + 0.09);
-  colliders.push({ x0: p.gate.from, z0: p.z1, x1: p.gate.to, z1: p.z1 + t, tag: 'gate' });
+  // south side: wall between the gates, a post each side of every gate, closed leaves
+  let from = p.x0 - t;
+  for (const g of [...p.gates].sort((a, b) => a.from - b.from)) {
+    wall(from, p.z1, g.from, p.z1 + t);
+    from = g.to;
+    for (const x of [g.from - 0.1, g.to + 0.1]) batch.box(M.compound, x - 0.12, -0.08, p.z1 - 0.03, x + 0.12, h + 0.18, p.z1 + t + 0.03);
+    if (g.leaves === 2) {
+      const mid = (g.from + g.to) / 2;
+      batch.box(M.gate, g.from + 0.02, 0.05, p.z1 + 0.04, mid - 0.01, h - 0.1, p.z1 + 0.09);
+      batch.box(M.gate, mid + 0.01, 0.05, p.z1 + 0.04, g.to - 0.02, h - 0.1, p.z1 + 0.09);
+    } else {
+      batch.box(M.gate, g.from + 0.02, 0.05, p.z1 + 0.04, g.to - 0.02, h - 0.1, p.z1 + 0.09);
+    }
+    colliders.push({ x0: g.from, z0: p.z1, x1: g.to, z1: p.z1 + t, tag: 'gate' });
+  }
+  wall(from, p.z1, p.x1 + t, p.z1 + t);
 
   // outside staircase against the north wall (drawn on the plan, rising to the east)
   const s = plan.stair;

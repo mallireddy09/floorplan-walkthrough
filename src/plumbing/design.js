@@ -176,7 +176,7 @@ const RW5 = RW('RW-5', 3.5, -2.2, -0.4, 'Foot of the north downpipe by the stair
 const RW6 = RW('RW-6', 7.9, -2.2, -0.45, 'Foot of the north-east downpipe.', 'RW-7');
 const RW7 = RW('RW-7', 10.0, -2.2, -0.47, 'North-east corner, turn south. The line passes above the sewer here; they do not connect.', 'RW-4');
 const RW4 = RW('RW-4', 10.0, 4.2, -0.54, 'Chamber part-way down the east rainwater line.', 'RW-3');
-const RW3 = RW('RW-3', 10.0, 11.65, -0.62, 'South-east corner by the gate: the south and east rainwater lines meet here and leave the plot.', 'Roadside storm drain');
+const RW3 = RW('RW-3', 10.0, 11.65, -0.62, 'By the walk gate on the south side: the south and east rainwater lines meet here and leave the plot.', 'Roadside storm drain');
 for (const [id, x, z, text] of [['YG-1', 10.0, 8.0, 'East yard'], ['YG-2', 10.0, 0.6, 'Outside the Hall east door'], ['YG-3', 5.7, -2.2, 'North yard']]) {
   chamber({ id, kind: 'yard', layer: 'rain', x, z, size: 0.3, invert: -0.45, name: `Yard gully ${id}`, purpose: `${text}: grated surface-water inlet. Paving and ground fall toward it at about 1 in 100.`, to: 'Rainwater line' });
 }

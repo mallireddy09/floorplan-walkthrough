@@ -15,10 +15,14 @@ Then open http://localhost:5173 in a browser.
 
 To try it on a phone on the same Wi-Fi, run `npm run dev:phone` instead and open the "Network" address it prints.
 
+## Opening view
+
+The page opens on the whole house seen from outside, slowly turning. "Enter" (or the Enter key) takes the camera down to the main entrance and in through the door, and the walk starts there.
+
 ## Controls
 
 - Computer: W A S D or the arrow keys to move, drag with the mouse to look around. Scrolling also walks: roll the mouse wheel away from you (or the matching two-finger scroll on a touchpad) to go forward, toward you to go back.
-- Phone: joystick (bottom left) to move, drag anywhere else to look.
+- Phone: joystick (bottom left) to move, drag anywhere else to look. The view buttons are folded into one "Menu" button at the bottom right.
 
 ## Buttons
 
