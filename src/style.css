@@ -460,7 +460,8 @@ body.plumbing #hint,
 body.plumbing #stick,
 body.plumbing #style,
 body.plumbing #time,
-body.plumbing #toggle {
+body.plumbing #toggle,
+body.plumbing #whole {
   display: none;
 }
 

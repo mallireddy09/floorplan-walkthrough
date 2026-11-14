@@ -25,6 +25,7 @@ const plumbEl = document.getElementById('plumb');
 const menuEl = document.getElementById('menu');
 const buttonsEl = document.getElementById('buttons');
 const enterEl = document.getElementById('enter');
+const wholeEl = document.getElementById('whole');
 
 const isTouch = window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
 if (isTouch) document.body.classList.add('touch');
@@ -250,6 +251,7 @@ menuEl.addEventListener('click', () => {
   const open = buttonsEl.classList.toggle('open');
   menuEl.setAttribute('aria-expanded', String(open));
   menuEl.textContent = open ? 'Close' : 'Menu';
+  if (open) hintEl.textContent = ''; // the hint would sit behind the open menu
   menuEl.blur();
 });
 document.getElementById('button-list').addEventListener('click', () => {
@@ -328,6 +330,27 @@ function enterHouse(instant = false) {
   document.body.classList.add('entering');
 }
 enterEl.addEventListener('click', () => enterHouse());
+
+/** Back out to the opening view of the whole house, from anywhere in the walk. */
+function showWholeHouse() {
+  if (intro.active || plumbing.active) return;
+  if (state.top) setTop(false); // the outside view needs the roof on
+  intro.active = true;
+  intro.flying = false;
+  intro.start = performance.now();
+  introCam.fov = 50;
+  introCam.updateProjectionMatrix();
+  document.body.classList.remove('entering');
+  document.body.classList.add('intro');
+  controls.enabled = false;
+  controls.keys.clear();
+  hintEl.textContent = '';
+  needsRender = true;
+}
+wholeEl.addEventListener('click', () => {
+  showWholeHouse();
+  wholeEl.blur();
+});
 window.addEventListener('keydown', (e) => {
   if (e.code === 'Enter' && intro.active) enterHouse();
 });
@@ -476,6 +499,7 @@ window.__walk = {
   },
   top: setTop,
   enter: enterHouse,
+  whole: showWholeHouse,
   intro,
   look: setLook,
   state: () => ({ x: pos.x, z: pos.z, room: lastRoom, ...state, pixelRatio, calls: renderer.info.render.calls, triangles: renderer.info.render.triangles }),

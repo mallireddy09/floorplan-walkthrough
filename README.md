@@ -29,6 +29,7 @@ The page opens on the whole house seen from outside, slowly turning. "Enter" (or
 - "Real style" / "Model style" switches between the clean 3D-model look and a lived-in look with richer materials, softer shading, curtains, pictures and everyday things in each room. The Real style takes a few seconds to prepare the first time.
 - "Night" / "Day" switches the time of day in either style.
 - "Top view" / "Walk view" switches to a top-down view of the whole home with the ceiling removed, and back.
+- "Whole house" goes back out to the opening view of the house from outside; "Enter" takes you in again at the main entrance.
 
 On a computer the Real style adds soft shading in corners, shadows from the room lights and a glow around lamps. On a phone those are left out to keep it smooth.
 
