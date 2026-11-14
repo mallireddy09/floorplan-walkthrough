@@ -1,0 +1,91 @@
+{
+  "units": "metres",
+  "about": "Read from the architect's 2D floor plan. Written dimensions (feet-inches) were converted at 1 ft = 0.3048 m. Origin is the north-west outer corner of the house; x runs east, z runs south. Everything the 3D scene builds comes from this file.",
+  "heights": {
+    "ceiling": 3.0,
+    "slab": 0.12,
+    "door": 2.1,
+    "sill": 0.9,
+    "windowHead": 2.1,
+    "bathSill": 1.5
+  },
+  "wallThickness": { "outer": 0.2286, "inner": 0.1143 },
+  "footprint": { "x0": 0, "z0": 0, "x1": 8.0772, "z1": 10.668 },
+  "plot": {
+    "x0": -1.3335, "z0": -6.4135, "x1": 17.2593, "z1": 12.0015,
+    "gate": { "side": "south", "from": 10.0, "to": 12.4 }
+  },
+  "stair": { "x0": 0, "z0": -1.8288, "x1": 3.2, "z1": 0, "landingTo": 0.85, "rises": "east" },
+  "start": { "x": 6.5, "z": 1.0, "heading": 180, "note": "Just inside the main entrance (north double door), facing south into the Hall" },
+
+  "rooms": [
+    { "id": "hall",    "name": "Hall",        "written": "11'-7½\" × 15'-9\"",  "x0": 4.3053, "z0": 0.2286, "x1": 7.8486, "z1": 5.0292,  "floor": "vitrified" },
+    { "id": "cbed",    "name": "C. Bed Room", "written": "13'-0\" × 11'-4½\"",  "x0": 0.2286, "z0": 0.2286, "x1": 4.1910, "z1": 3.6957,  "floor": "vitrified" },
+    { "id": "mbed",    "name": "M. Bed Room", "written": "13'-0\" × 12'-0\"",   "x0": 0.2286, "z0": 6.7818, "x1": 4.1910, "z1": 10.4394, "floor": "vitrified" },
+    { "id": "kitchen", "name": "Kitchen",     "written": "11'-7½\" × 12'-0\"",  "x0": 4.3053, "z0": 6.7818, "x1": 7.8486, "z1": 10.4394, "floor": "vitrified" },
+    { "id": "pooja",   "name": "Pooja",       "written": "6'-0\" × 5'-0\"",     "x0": 6.0198, "z0": 5.1435, "x1": 7.8486, "z1": 6.6675,  "floor": "vitrified" },
+    { "id": "toilet1", "name": "Toilet 1",    "written": "7'-0\" × 4'-0\"",     "x0": 0.2286, "z0": 3.8100, "x1": 2.3622, "z1": 5.0292,  "floor": "bath", "light": true,
+      "wet": { "x0": 0.2286, "z0": 3.8100, "x1": 1.03, "z1": 5.0292, "note": "assumed: shower end by the window; WC and basin stay dry by the door" } },
+    { "id": "toilet2", "name": "Toilet 2",    "written": "7'-0\" × 5'-0\"",     "x0": 0.2286, "z0": 5.1435, "x1": 2.3622, "z1": 6.6675,  "floor": "bath", "light": true,
+      "wet": { "x0": 0.2286, "z0": 5.1435, "x1": 1.03, "z1": 6.6675, "note": "assumed: shower end by the window; WC and basin stay dry by the door" } },
+    { "id": "lobby",   "name": "Lobby",       "written": null, "derived": "5'-7½\" × 9'-4½\" (space left between the toilets and the centre wall)", "x0": 2.4765, "z0": 3.8100, "x1": 4.1910, "z1": 6.6675, "floor": "vitrified", "light": true },
+    { "id": "passage", "name": "Passage",     "written": null, "derived": "5'-3\" × 5'-9\" (space left between the centre wall and the Pooja)",     "x0": 4.3053, "z0": 5.0292, "x1": 5.9055, "z1": 6.7818, "floor": "vitrified", "light": true }
+  ],
+
+  "walls": [
+    { "id": "N",   "kind": "outer", "x0": 0,      "z0": 0,       "x1": 8.0772, "z1": 0.2286 },
+    { "id": "S",   "kind": "outer", "x0": 0,      "z0": 10.4394, "x1": 8.0772, "z1": 10.668 },
+    { "id": "W",   "kind": "outer", "x0": 0,      "z0": 0.2286,  "x1": 0.2286, "z1": 10.4394 },
+    { "id": "E",   "kind": "outer", "x0": 7.8486, "z0": 0.2286,  "x1": 8.0772, "z1": 10.4394 },
+
+    { "id": "C1",  "kind": "inner", "note": "centre wall, C. Bed/Lobby side to Hall", "x0": 4.1910, "z0": 0.2286, "x1": 4.3053, "z1": 5.1435 },
+    { "id": "C2",  "kind": "inner", "note": "centre wall, M. Bed to Kitchen",          "x0": 4.1910, "z0": 6.6675, "x1": 4.3053, "z1": 10.4394 },
+    { "id": "CS",  "kind": "inner", "note": "C. Bed south wall",                       "x0": 0.2286, "z0": 3.6957, "x1": 4.1910, "z1": 3.8100 },
+    { "id": "T12", "kind": "inner", "note": "between Toilet 1 and Toilet 2",           "x0": 0.2286, "z0": 5.0292, "x1": 2.3622, "z1": 5.1435 },
+    { "id": "TE",  "kind": "inner", "note": "east wall of both toilets",               "x0": 2.3622, "z0": 3.8100, "x1": 2.4765, "z1": 6.6675 },
+    { "id": "MN",  "kind": "inner", "note": "M. Bed north wall",                       "x0": 0.2286, "z0": 6.6675, "x1": 4.1910, "z1": 6.7818 },
+    { "id": "PN",  "kind": "inner", "note": "Pooja north wall",                        "x0": 5.9055, "z0": 5.0292, "x1": 7.8486, "z1": 5.1435 },
+    { "id": "PW",  "kind": "inner", "note": "Pooja west wall",                         "x0": 5.9055, "z0": 5.1435, "x1": 6.0198, "z1": 6.6675 },
+    { "id": "PS",  "kind": "inner", "note": "Pooja south wall",                        "x0": 5.9055, "z0": 6.6675, "x1": 7.8486, "z1": 6.7818 }
+  ],
+
+  "openings_note": "from/to are absolute positions along the wall's long axis (x for east-west walls, z for north-south walls). swing '+' means the leaf opens toward +z (south) or +x (east); '-' the other way. hinge 'start' is the 'from' end.",
+
+  "doors": [
+    { "id": "main",        "name": "Main entrance",     "wall": "N",  "from": 5.90, "to": 7.10, "height": 2.1, "type": "double", "swing": "+" },
+    { "id": "hallEast",    "name": "Hall east door",    "wall": "E",  "from": 0.85, "to": 2.05, "height": 2.1, "type": "double", "swing": "-", "notOnPlan": true, "note": "Added on request. The plan draws a window here (the northern of the two on the Hall's east wall); this door takes that window's exact opening." },
+    { "id": "kitchenBack", "name": "Kitchen south door", "wall": "S", "from": 4.60, "to": 5.80, "height": 2.1, "type": "double", "swing": "-" },
+    { "id": "cbed",        "name": "C. Bed Room door",  "wall": "CS", "from": 3.19, "to": 4.09, "height": 2.1, "type": "single", "hinge": "end",   "swing": "-" },
+    { "id": "mbed",        "name": "M. Bed Room door",  "wall": "MN", "from": 3.19, "to": 4.09, "height": 2.1, "type": "single", "hinge": "end",   "swing": "+" },
+    { "id": "toilet1",     "name": "Toilet 1 door",     "wall": "TE", "from": 3.91, "to": 4.71, "height": 2.1, "type": "single", "hinge": "start", "swing": "-" },
+    { "id": "toilet2",     "name": "Toilet 2 door",     "wall": "MN", "from": 1.51, "to": 2.31, "height": 2.1, "type": "single", "hinge": "end",   "swing": "-" },
+    { "id": "pooja",       "name": "Pooja door",        "wall": "PW", "from": 5.24, "to": 6.04, "height": 2.1, "type": "single", "hinge": "start", "swing": "+", "assumed": true }
+  ],
+
+  "windows": [
+    { "id": "cbedN",    "wall": "N", "from": 1.10, "to": 3.00, "sill": 0.9, "height": 1.2 },
+    { "id": "hallN1",   "wall": "N", "from": 4.70, "to": 5.55, "sill": 0.9, "height": 1.2 },
+    { "id": "hallN2",   "wall": "N", "from": 7.30, "to": 7.70, "sill": 0.9, "height": 1.2 },
+    { "id": "hallE2",   "wall": "E", "from": 2.85, "to": 4.60, "sill": 0.9, "height": 1.2 },
+    { "id": "poojaE",   "wall": "E", "from": 5.50, "to": 6.30, "sill": 0.9, "height": 1.2 },
+    { "id": "kitchenE", "wall": "E", "from": 7.85, "to": 9.35, "sill": 0.9, "height": 1.2 },
+    { "id": "mbedS",    "wall": "S", "from": 1.30, "to": 3.10, "sill": 0.9, "height": 1.2 },
+    { "id": "kitchenS", "wall": "S", "from": 6.30, "to": 7.40, "sill": 0.9, "height": 1.2 },
+    { "id": "toilet1W", "wall": "W", "from": 4.10, "to": 4.70, "sill": 1.5, "height": 0.6, "frosted": true },
+    { "id": "toilet2W", "wall": "W", "from": 5.60, "to": 6.20, "sill": 1.5, "height": 0.6, "frosted": true }
+  ],
+
+  "connections": [
+    ["outside", "hall", "main entrance, double door"],
+    ["outside", "hall", "east door, double (added on request, drawn as a window on the plan)"],
+    ["hall", "passage", "open, no door"],
+    ["passage", "kitchen", "open, no door"],
+    ["passage", "lobby", "open, no door"],
+    ["passage", "pooja", "door (assumed, not drawn)"],
+    ["lobby", "cbed", "door"],
+    ["lobby", "toilet1", "door"],
+    ["lobby", "mbed", "door"],
+    ["mbed", "toilet2", "door (attached)"],
+    ["kitchen", "outside", "double door on the south wall"]
+  ]
+}
