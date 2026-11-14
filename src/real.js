@@ -60,9 +60,8 @@ export function realShell(plan, M, { main, up, colliders }) {
   // curtains, drawn open to each side of the window
   const curtains = [
     ['hallE2', M.curtainHall, 0.86], // stops above the sofa back
-    ['hallN1', M.curtainHall, 0.1],
     ['cbedW', M.curtainKids, 0.1],
-    ['mbedS', M.curtainMaster, 0.92], // stops above the headboard
+    ['mbedW', M.curtainMaster, 0.75], // sill length, clear of the laundry basket
   ];
   for (const [id, mat, drop] of curtains) {
     const w = win(id);
@@ -72,7 +71,7 @@ export function realShell(plan, M, { main, up, colliders }) {
     main.add(mat, curtainPanel(f.axis, f.pos, w.to - 0.1, w.to + 0.26, drop, 2.262, f.facing));
   }
   // roller blinds, rolled up, where curtains would get in the way
-  for (const id of ['kitchenE', 'kitchenS', 'poojaE']) {
+  for (const id of ['kitchenE']) {
     const w = win(id);
     const f = insideFace(plan, w.wall);
     const head = w.sill + w.height;
@@ -169,13 +168,13 @@ function outdoors(plan, M, b, colliders) {
 // ------------------------------------------------------------------ rooms
 
 /** Things on and around the furniture. Small floor items sit where nobody can walk. */
-export function realDetails(plan, M, { b, colliders }) {
+export function realDetails(plan, M, { b, at, colliders }) {
   hall(b, M);
   corridor(b, M);
   childBedroom(b, M, colliders);
   masterBedroom(b, M, colliders);
   kitchen(b, M, colliders);
-  pooja(b, M);
+  pooja(b, M, at);
   toilet1(b, M, colliders);
   toilet2(b, M, colliders);
 }
@@ -352,26 +351,29 @@ function kitchen(b, M, colliders) {
   b.sphere(M.plant, 4.5, top + 0.14, 8.43, 0.08);
 }
 
-function pooja(b, M) {
+function pooja(b, M, at) {
+  // The mandir stands against the east wall, facing west. Local positions below are
+  // across its width (x) and from its back (-0.2) to its front (+0.2).
+  const p = at(7.6486, 5.9055, 'w');
   // picture on the back panel, garland along the front, bell, flowers and a plate
-  framed(b, M, 'x', 6.6375, -1, 6.9, 7.3, 1.05, 1.45, [2, 2], null, 0.001);
+  framed(b, M, 'z', 7.8186, -1, 5.7055, 6.1055, 1.05, 1.45, [2, 2], null, 0.001);
   for (let i = 0; i <= 16; i++) {
     const t = i / 16;
-    b.sphere(i % 2 ? M.orange : M.yellow, 6.7 + t * 0.8, 1.63 - 0.07 * Math.sin(Math.PI * t), 6.285, 0.024);
+    p.sphere(i % 2 ? M.orange : M.yellow, 0.4 - t * 0.8, 1.63 - 0.07 * Math.sin(Math.PI * t), 0.1825, 0.024);
   }
-  b.cyl(M.dark, 7.38, 1.56, 6.34, 0.003, 0.09);
-  b.cyl(M.brass, 7.38, 1.5, 6.34, 0.035, 0.06, 0.012, 12);
-  for (const [x, z, m] of [[6.86, 6.46, M.orange], [6.9, 6.43, M.yellow], [7.3, 6.45, M.orange], [7.34, 6.42, M.red], [7.1, 6.4, M.yellow]]) {
-    b.sphere(m, x, 0.895, z, 0.018);
+  p.cyl(M.dark, -0.28, 1.56, 0.1275, 0.003, 0.09);
+  p.cyl(M.brass, -0.28, 1.5, 0.1275, 0.035, 0.06, 0.012, 12);
+  for (const [x, z, m] of [[0.24, 0.0075, M.orange], [0.2, 0.0375, M.yellow], [-0.2, 0.0175, M.orange], [-0.24, 0.0475, M.red], [0, 0.0675, M.yellow]]) {
+    p.sphere(m, x, 0.895, z, 0.018);
   }
-  b.cyl(M.steel, 6.95, 0.88, 6.36, 0.06, 0.008);
-  b.sphere(M.red, 6.93, 0.895, 6.36, 0.014);
-  b.sphere(M.yellow, 6.97, 0.895, 6.37, 0.014);
-  b.cyl(M.brown, 7.27, 0.88, 6.33, 0.003, 0.18);
+  p.cyl(M.steel, 0.15, 0.88, 0.1075, 0.06, 0.008);
+  p.sphere(M.red, 0.17, 0.895, 0.1075, 0.014);
+  p.sphere(M.yellow, 0.13, 0.895, 0.0975, 0.014);
+  p.cyl(M.brown, -0.17, 0.88, 0.1375, 0.003, 0.18);
   // rangoli on the floor inside the door
-  b.cyl(M.red, 6.42, 0.001, 5.82, 0.2, 0.003, 0.2, 24);
-  b.cyl(M.yellow, 6.42, 0.004, 5.82, 0.14, 0.002, 0.14, 24);
-  b.cyl(M.paper, 6.42, 0.006, 5.82, 0.075, 0.002, 0.075, 24);
+  b.cyl(M.red, 6.38, 0.001, 5.9, 0.2, 0.003, 0.2, 24);
+  b.cyl(M.yellow, 6.38, 0.004, 5.9, 0.14, 0.002, 0.14, 24);
+  b.cyl(M.paper, 6.38, 0.006, 5.9, 0.075, 0.002, 0.075, 24);
 }
 
 function bucketAndMug(b, M, x, z, mx, mz) {

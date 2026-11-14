@@ -252,6 +252,14 @@ function plant(p, M, scale = 1) {
   p.solid(-0.19 * scale, -0.19 * scale, 0.19 * scale, 0.19 * scale, 'plant');
 }
 
+/** Wall-mounted air conditioner (indoor unit), its back against the wall, high up. */
+function airConditioner(p, M) {
+  p.box(M.laminate, -0.43, 2.3, -0.1, 0.43, 2.59, 0.1);
+  p.box(M.dark, -0.4, 2.3, 0.06, 0.4, 2.33, 0.102); // outlet slot
+  p.box(M.dark, -0.42, 2.455, 0.1, 0.42, 2.459, 0.102); // front panel line
+  p.box(M.steel, 0.3, 2.37, 0.1, 0.36, 2.39, 0.103); // display
+}
+
 function wc(p, M, d = 0.68) {
   // back of the cistern against the wall; 0.38 wide, d deep (0.6 for a compact one)
   const hd = d / 2;
@@ -309,6 +317,7 @@ function childBedroom(at, b, M) {
   chair(at(3.44, 0.83, 'e'), M);
   at(3.44, 0.83, 'e').solid(-0.21, -0.21, 0.21, 0.21, 'chair');
   bookshelf(at(1.15, 0.385, 's'), M, 0.9, 0.3, 1.5); // on the north wall, clear of the west window
+  airConditioner(at(2.3, 0.3286, 's'), M); // on the north wall
   b.box(M.rugKids, 1.1, 0.001, 0.7, 2.9, 0.012, 1.8);
 }
 
@@ -316,9 +325,9 @@ function masterBedroom(at, b, M) {
   // Wardrobe in the south-west corner, on the west wall.
   wardrobe(at(0.535, 9.33, 'e'), M, 2.2, 0.6, 2.1, 4, M.oak);
   // Bed faces north: head against the south wall, feet toward the north.
-  // The headboard is kept just under the sill so it does not cover the window.
-  bed(at(2.5, 9.4094, 'n'), M, 1.8, 2.05, M.blanketMaster, 2, 0.88);
+  bed(at(2.5, 9.4094, 'n'), M, 1.8, 2.05, M.blanketMaster, 2);
   bedside(at(3.67, 10.235, 'n'), M);
+  airConditioner(at(2.72, 6.8818, 's'), M); // on the north wall, between the two doors
   b.box(M.rugMaster, 1.35, 0.001, 7.45, 3.65, 0.012, 9.4);
 }
 
@@ -375,8 +384,7 @@ function kitchen(at, b, M, colliders) {
   // tile splashback on the solid parts of the walls behind the counter
   b.box(M.splash, x1 - 0.006, 0.86, zN, x1, 1.5, 7.85);
   b.box(M.splash, x1 - 0.006, 0.86, 9.35, x1, 1.55, zS);
-  b.box(M.splash, 6.0, 0.86, zS - 0.006, 6.3, 1.5, zS);
-  b.box(M.splash, 7.4, 0.86, zS - 0.006, x1, 1.5, zS);
+  b.box(M.splash, 6.0, 0.86, zS - 0.006, x1, 1.5, zS);
 
   colliders.push({ x0: x0 - 0.02, z0: zN, x1, z1: zS, tag: 'kitchen counter' });
   colliders.push({ x0: 6.0, z0: zS - 0.6, x1: x0, z1: zS, tag: 'kitchen counter' });
@@ -406,8 +414,8 @@ function kitchen(at, b, M, colliders) {
 }
 
 function pooja(at, b, M) {
-  // mandir against the south wall, facing north
-  const p = at(7.1, 6.4675, 'n');
+  // mandir against the east wall, facing west, so you face east when you pray
+  const p = at(7.6486, 5.9055, 'w');
   const hw = 0.45;
   const hd = 0.2;
   p.box(M.teak, -hw, 0, -hd, hw, 0.85, hd);
@@ -438,7 +446,7 @@ function pooja(at, b, M) {
   }
   p.cyl(M.steel, 0, 0.88, 0.1, 0.07, 0.012);
   p.solid(-hw - 0.02, -hd, hw + 0.02, hd + 0.02, 'mandir');
-  b.box(M.saffron, 6.75, 0.001, 5.55, 7.45, 0.012, 6.1); // prayer mat
+  b.box(M.saffron, 6.65, 0.001, 5.6, 7.35, 0.012, 6.2); // prayer mat, in front of the mandir
 }
 
 /**

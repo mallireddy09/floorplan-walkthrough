@@ -10,7 +10,7 @@ import * as THREE from 'three';
 const ROOMS = {
   hall: { ceil: [6.08, 2.6], win: [8.9, 1.9, 3.7], aim: [5.2, 0.6, 3.4], shadow: true },
   cbed: { ceil: [2.21, 1.96], win: [-0.75, 1.9, 1.05], aim: [2.6, 0.6, 1.7], shadow: true },
-  mbed: { ceil: [2.21, 8.61], win: [2.2, 1.9, 11.4], aim: [2.2, 0.6, 8.2], shadow: true },
+  mbed: { ceil: [2.21, 8.61], win: [-0.75, 1.9, 7.45], aim: [2.7, 0.6, 8.1], shadow: true },
   kitchen: { ceil: [6.0, 8.6], win: [8.9, 1.9, 8.6], aim: [5.4, 0.6, 8.6], shadow: true },
   corridor: { ceil: [4.25, 5.9], shadow: true }, // lobby and passage share one light
   toilet1: { ceil: [1.3, 4.42] },

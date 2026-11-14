@@ -231,7 +231,7 @@ export const surfaceFlows = [
 const borewell = { x: 16.2, z: -5.4 };
 const sump = { x0: 13.4, x1: 15.2, z0: -5.7, z1: -3.9, wall: 0.15, floor: -1.8, water: -0.4 };
 const pump = { x: 14.3, z: -3.45 };
-const oht = { x: 0.9, z: 0.9, r: 0.55, base: ROOF + 0.45, top: ROOF + 1.7 }; // north-west corner of the roof
+const oht = { x: 0.9, z: 9.77, r: 0.55, base: ROOF + 0.45, top: ROOF + 1.7 }; // south-west corner of the roof, over the house walls
 const sumpMid = [(sump.x0 + sump.x1) / 2, (sump.z0 + sump.z1) / 2];
 const metres = (a, b) => Math.round(Math.hypot(a[0] - b[0], a[1] - b[1]) * 10) / 10;
 const boreToTank = metres([borewell.x, borewell.z], TANK_MID);
@@ -266,11 +266,11 @@ structures.push({
 labels.push({ text: 'Sump', layer: 'fresh', at: [sumpMid[0], 0.45, sumpMid[1]] });
 structures.push({ id: 'Pump', kind: 'pump', layer: 'fresh', ...pump, name: 'Water pump', purpose: 'Lifts water from the sump to the overhead tank.', details: [['Type', 'About 0.5 hp self-priming pump on a raised plinth, beside the sump and borewell'], ['Suction', '25 mm with a foot valve in the sump'], ['Delivery', '25 mm rising main to the roof tank']] });
 labels.push({ text: 'Pump', layer: 'fresh', at: [pump.x, 0.75, pump.z] });
-structures.push({ id: 'Overhead tank', kind: 'oht', layer: 'fresh', ...oht, name: 'Overhead water tank', purpose: 'Feeds every tap in the house by gravity.', details: [['Capacity', '1,000 litres'], ['Position', 'On the roof at the north-west corner, above the C. Bed Room, on a 0.45 m stand'], ['Inlet', '25 mm rising main with a float valve'], ['Outlet', '32 mm main with a shut-off valve']] });
+structures.push({ id: 'Overhead tank', kind: 'oht', layer: 'fresh', ...oht, name: 'Overhead water tank', purpose: 'Feeds every tap in the house by gravity.', details: [['Capacity', '1,000 litres'], ['Position', 'On the roof at the south-west corner, above the M. Bed Room, on a 0.45 m stand'], ['Inlet', '25 mm rising main with a float valve'], ['Outlet', '32 mm main with a shut-off valve']] });
 labels.push({ text: 'Overhead tank', layer: 'fresh', at: [oht.x, oht.top + 0.3, oht.z] });
 
 pipe({ id: 'suction', layer: 'fresh', name: 'Pump suction', purpose: 'Draws water from near the bottom of the sump.', dia: 25, material: UPVC, from: 'Sump', to: 'Pump' }, [[pump.x, -1.6, sump.z1 - 0.4], [pump.x, 0.25, sump.z1 - 0.4], [pump.x, 0.25, pump.z - 0.1]]);
-pipe({ id: 'rising', layer: 'fresh', name: 'Rising main', purpose: 'Pumped water from the sump to the overhead tank: underground across the north yard, up the east wall at the north-east corner of the house, then west along the roof to the tank. Where it crosses the east drain and rainwater line it passes above them in a sleeve.', dia: 25, material: UPVC, from: 'Pump', to: 'Overhead tank' }, [[pump.x, 0.25, pump.z + 0.1], [pump.x, -0.25, pump.z + 0.1], [pump.x, -0.25, -1.2], [8.2, -0.25, -1.2], [8.2, -0.25, 0.5], [8.2, ROOF + 0.2, 0.5], [7.6, ROOF + 0.2, 0.9], [1.7, ROOF + 0.2, 0.9], [oht.x + 0.45, ROOF + 0.2, oht.z + 0.3], [oht.x + 0.45, oht.top - 0.1, oht.z + 0.3]]);
+pipe({ id: 'rising', layer: 'fresh', name: 'Rising main', purpose: 'Pumped water from the sump to the overhead tank: underground across the north yard, up the east wall at the north-east corner of the house, then along the roof to the tank in the south-west corner. Where it crosses the east drain and rainwater line it passes above them in a sleeve.', dia: 25, material: UPVC, from: 'Pump', to: 'Overhead tank' }, [[pump.x, 0.25, pump.z + 0.1], [pump.x, -0.25, pump.z + 0.1], [pump.x, -0.25, -1.2], [8.2, -0.25, -1.2], [8.2, -0.25, 0.5], [8.2, ROOF + 0.2, 0.5], [7.6, ROOF + 0.2, 0.9], [7.6, ROOF + 0.2, oht.z + 0.3], [oht.x + 0.45, ROOF + 0.2, oht.z + 0.3], [oht.x + 0.45, oht.top - 0.1, oht.z + 0.3]]);
 
 const cold = (id, name, purpose, dia, from, to, pts) => pipe({ id, layer: 'fresh', name, purpose, dia, material: UPVC, from, to }, pts);
 const hot = (id, name, purpose, from, to, pts) => pipe({ id, layer: 'fresh', hot: true, name, purpose, dia: 15, material: CPVC, from, to }, pts);
@@ -279,7 +279,7 @@ const HI = 2.35; // cold pipe along the bathroom walls, above the tiles
 const HH = 2.22; // hot pipe just below it
 
 // main from the tank, along the roof to above the two bathrooms, then on to the kitchen side
-cold('main', 'Main distribution pipe', 'Cold water from the overhead tank along the roof to the bathrooms.', 32, 'Overhead tank', 'Bathroom branches', [[oht.x, oht.base + 0.05, oht.z + 0.55], [oht.x, RY, oht.z + 0.55], [2.3, RY, oht.z + 0.55], [2.3, RY, 5.09]]);
+cold('main', 'Main distribution pipe', 'Cold water from the overhead tank along the roof to the bathrooms.', 32, 'Overhead tank', 'Bathroom branches', [[oht.x, oht.base + 0.05, oht.z - 0.55], [oht.x, RY, oht.z - 0.55], [2.3, RY, oht.z - 0.55], [2.3, RY, 5.09]]);
 cold('main-kitchen', 'Kitchen-side distribution pipe', 'Continues the main across the roof from above the bathrooms to above the kitchen, for the sink, wash area and utility taps.', 25, 'Main distribution pipe', 'Kitchen, wash area and utility branches', [[2.3, RY, 5.09], [4.25, RY, 5.09], [4.25, RY, 9.05], [7.0, RY, 9.05]]);
 
 // Toilet 1 (second bedroom side): its own branch and shut-off
