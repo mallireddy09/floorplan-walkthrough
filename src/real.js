@@ -85,7 +85,7 @@ export function realShell(plan, M, { main, up, colliders }) {
   plate('x', 0.2286, +1, 7.2); // hall, beside the main door
   plate('x', 3.6957, -1, 3.1); // C. Bed Room
   plate('x', 6.7818, +1, 3.12); // M. Bed Room
-  plate('x', 6.7818, +1, 6.2); // kitchen
+  plate('z', 4.3053, +1, 9.75); // kitchen, by the south door
   plate('z', 2.4765, +1, 4.88); // lobby, for Toilet 1
   plate('z', 4.3053, +1, 5.08); // passage
 
@@ -301,20 +301,20 @@ function masterBedroom(b, M, colliders) {
 function kitchen(b, M, colliders) {
   const x0 = 7.2486;
   const top = 0.86;
-  // kettle and spice jars between the fridge and the sink
+  // kettle and spice jars at the north end of the counter
   b.cyl(M.steel, 7.62, top, 7.68, 0.075, 0.16, 0.06);
   b.cyl(M.dark, 7.62, top + 0.16, 7.68, 0.05, 0.02);
   b.box(M.dark, 7.5, top + 0.06, 7.67, 7.55, top + 0.16, 7.69);
   [M.red, M.yellow, M.brown, M.green].forEach((m, i) => {
-    b.cyl(m, 7.78, top, 7.86 + i * 0.085, 0.03, 0.08);
-    b.cyl(M.steel, 7.78, top + 0.08, 7.86 + i * 0.085, 0.031, 0.012);
+    b.cyl(m, 7.78, top, 7.57 + i * 0.075, 0.03, 0.08);
+    b.cyl(M.steel, 7.78, top + 0.08, 7.57 + i * 0.075, 0.031, 0.012);
   });
   // chopping board with tomatoes and a knife
-  b.box(M.oak, 7.33, top, 7.82, 7.6, top + 0.015, 8.12);
-  b.sphere(M.red, 7.4, top + 0.045, 7.9, 0.032);
-  b.sphere(M.red, 7.46, top + 0.045, 7.98, 0.032);
-  b.box(M.steel, 7.5, top + 0.015, 7.9, 7.525, top + 0.018, 8.03);
-  b.box(M.dark, 7.5, top + 0.015, 8.03, 7.525, top + 0.03, 8.1);
+  b.box(M.oak, 7.33, top, 8.55, 7.6, top + 0.015, 8.83);
+  b.sphere(M.red, 7.4, top + 0.045, 8.62, 0.032);
+  b.sphere(M.red, 7.46, top + 0.045, 8.7, 0.032);
+  b.box(M.steel, 7.5, top + 0.015, 8.6, 7.525, top + 0.018, 8.72);
+  b.box(M.dark, 7.5, top + 0.015, 8.72, 7.525, top + 0.03, 8.79);
   // washed-up things beside the sink
   b.box(M.steel, 7.42, top, 8.86, 7.78, top + 0.012, 9.3);
   b.cyl(M.steel, 7.6, top + 0.012, 8.98, 0.105, 0.05);
@@ -341,30 +341,30 @@ function kitchen(b, M, colliders) {
   b.sphere(M.banana, 6.77, top + 0.11, 10.16, 0.03, 3.0, 0.9, 0.9);
   // tea towel on a handle, mat in front of the sink
   b.box(M.teaTowel, x0 - 0.014, 0.38, 8.94, x0 + 0.002, 0.72, 9.14);
-  b.rbox(M.mat, 6.6, 0.001, 8.1, 7.2, 0.014, 8.9, 0.006);
+  b.rbox(M.mat, 6.6, 0.001, 7.8, 7.2, 0.014, 8.6, 0.006);
   // fridge: magnets, a note, a basket on top
-  b.box(M.red, 7.133, 1.45, 6.95, 7.14, 1.5, 7.0);
-  b.box(M.yellow, 7.133, 1.52, 7.2, 7.14, 1.58, 7.26);
-  b.box(M.blue, 7.133, 1.3, 7.3, 7.14, 1.34, 7.36);
-  b.box(M.paper, 7.134, 1.3, 7.02, 7.14, 1.42, 7.12);
-  b.rbox(M.basket, 7.25, 1.75, 6.9, 7.75, 1.9, 7.35, 0.02);
-  // water purifier and calendar on the wall
-  onWall(b, M.plastic, 'x', 6.7818, +1, 6.82, 7.08, 1.35, 1.8, 0, 0.13);
-  onWall(b, M.blue, 'x', 6.7818, +1, 6.86, 7.04, 1.52, 1.76, 0.13, 0.134);
-  b.cyl(M.steel, 6.95, 1.33, 6.87, 0.01, 0.03);
-  b.box(M.paper, 6.41, 1.29, 6.7818, 6.71, 1.73, 6.7858);
-  framed(b, M, 'x', 6.7818, +1, 6.42, 6.7, 1.3, 1.72, [2, 1], null, 0.004);
+  b.box(M.red, 5.015, 1.45, 8.72, 5.022, 1.5, 8.77);
+  b.box(M.yellow, 5.015, 1.52, 8.9, 5.022, 1.58, 8.96);
+  b.box(M.blue, 5.015, 1.3, 9.04, 5.022, 1.34, 9.1);
+  b.box(M.paper, 5.015, 1.3, 8.8, 5.021, 1.42, 8.9);
+  b.rbox(M.basket, 4.4, 1.75, 8.62, 4.9, 1.9, 9.12, 0.02);
+  // water purifier above the north end of the counter, calendar by the door: both kept off the Pooja wall
+  onWall(b, M.plastic, 'z', 7.8486, -1, 7.56, 7.82, 1.35, 1.8, 0, 0.13);
+  onWall(b, M.blue, 'z', 7.8486, -1, 7.6, 7.78, 1.52, 1.76, 0.13, 0.134);
+  b.cyl(M.steel, 7.76, 1.33, 7.69, 0.01, 0.03);
+  b.box(M.paper, 4.3053, 1.29, 9.29, 4.3093, 1.73, 9.59);
+  framed(b, M, 'z', 4.3053, +1, 9.3, 9.58, 1.3, 1.72, [2, 1], null, 0.004);
   // bin beside the storage unit
   b.cyl(M.laminateGrey, 4.47, 0, 9.4, 0.12, 0.32, 0.135, 16);
   b.cyl(M.dark, 4.47, 0.32, 9.4, 0.14, 0.02, 0.14, 16);
   colliders.push({ x0: 4.33, z0: 9.26, x1: 4.61, z1: 9.54, tag: 'prop' });
   // jars and a herb pot on the storage unit
-  b.cyl(M.brown, 4.5, top, 8.22, 0.04, 0.12);
-  b.cyl(M.yellow, 4.5, top, 8.33, 0.04, 0.12);
-  b.cyl(M.steel, 4.5, top + 0.12, 8.22, 0.042, 0.012);
-  b.cyl(M.steel, 4.5, top + 0.12, 8.33, 0.042, 0.012);
-  b.cyl(M.pot, 4.5, top, 9.13, 0.045, 0.08, 0.055);
-  b.sphere(M.plant, 4.5, top + 0.14, 9.13, 0.08);
+  b.cyl(M.brown, 4.5, top, 7.52, 0.04, 0.12);
+  b.cyl(M.yellow, 4.5, top, 7.63, 0.04, 0.12);
+  b.cyl(M.steel, 4.5, top + 0.12, 7.52, 0.042, 0.012);
+  b.cyl(M.steel, 4.5, top + 0.12, 7.63, 0.042, 0.012);
+  b.cyl(M.pot, 4.5, top, 8.43, 0.045, 0.08, 0.055);
+  b.sphere(M.plant, 4.5, top + 0.14, 8.43, 0.08);
 }
 
 function pooja(b, M) {

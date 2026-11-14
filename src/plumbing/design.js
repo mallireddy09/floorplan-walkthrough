@@ -103,7 +103,7 @@ fall({ id: 'gt1-ic1', layer: 'waste', name: 'GT-1 outlet', purpose: 'Trapped was
 fall({ id: 'gt2-ic1', layer: 'waste', name: 'GT-2 outlet', purpose: 'Trapped wastewater from Toilet 2 into the inspection chamber.', dia: 110, material: SWR, from: 'GT-2', to: 'IC-1' }, GT2.invert, 60, [[GT2.x, GT2.z], [IC1.x, IC1.z]]);
 
 // --- kitchen sink, wash area, utility
-pipe({ id: 'waste-sink-drop', layer: 'waste', name: 'Kitchen sink waste', purpose: 'Sink waste through the east wall and down to the grease trap.', dia: 75, material: SWR, from: 'Kitchen sink', to: 'Grease trap' }, [[7.55, 0.6, 8.5], [8.22, 0.55, 8.5], [8.22, -0.3, 8.5], [8.45, -0.31, 8.5]]);
+pipe({ id: 'waste-sink-drop', layer: 'waste', name: 'Kitchen sink waste', purpose: 'Sink waste through the east wall and down to the grease trap.', dia: 75, material: SWR, from: 'Kitchen sink', to: 'Grease trap' }, [[7.55, 0.6, 8.2], [8.22, 0.55, 8.2], [8.22, -0.3, 8.2], [8.42, -0.31, 8.35]]);
 fall({ id: 'waste-wash', layer: 'waste', name: 'Kitchen wash area waste', purpose: 'Wash area gully to the grease trap.', dia: 75, material: SWR, from: 'GT-W', to: 'Grease trap' }, GTW.invert, 40, [[GTW.x, GTW.z], [GRT.x, GRT.z + 0.25]]);
 fall({ id: 'grease-ic4', layer: 'waste', name: 'Grease trap outlet', purpose: 'Kitchen wastewater, after the grease trap, into the east drain.', dia: 110, material: SWR, from: 'Grease trap', to: 'IC-4' }, GRT.invert, 60, [[GRT.x, GRT.z], [IC4.x, IC4.z]]);
 fall({ id: 'waste-utility', layer: 'waste', name: 'Utility / washing area waste', purpose: 'Washing machine and clothes-washing water to the east drain.', dia: 110, material: SWR, from: 'GT-U', to: 'IC-3' }, GTU.invert, 60, [[GTU.x, GTU.z], [IC3.x, IC3.z]]);
@@ -117,18 +117,22 @@ fall({ ...sewer, id: 'sewer-4-5', name: 'East drain IC-4 to IC-5', purpose: 'Kit
 fall({ ...sewer, id: 'sewer-5-7', name: 'North drain IC-5 to IC-7', purpose: 'Kitchen and utility wastewater, across the north yard.', from: 'IC-5', to: 'IC-7' }, IC5.invert, 60, [[IC5.x, IC5.z], [IC7.x, IC7.z]]);
 
 // --- septic tank (IS 2470 Part 1: 2.0 x 0.9 m, 1.0 m of liquid, two compartments 2:1)
+// It stands in the north-west of the north yard, lying east-west: sewage enters at
+// the east end and settled water leaves at the west end. There is no soak pit on the
+// plot; the outlet stops at a chamber by the west boundary for a sewer connection.
 const tank = {
-  x0: 4.02, x1: 5.38, z0: -5.81, z1: -3.35, wall: 0.23, // outside faces; flow runs south to north
-  inletZ: -3.35, outletX: 4.02, outletZ: -5.3,
+  x0: 0.37, x1: 2.83, z0: -5.88, z1: -4.52, wall: 0.23, // outside faces
+  inlet: [2.83, -5.2], outlet: [0.37, -5.2],
 };
-const tankInlet = fall({ ...sewer, id: 'sewer-7-tank', name: 'Septic tank inlet', purpose: 'All sewage and wastewater enters the tank here through a dip tee.', from: 'IC-7', to: 'Septic tank' }, IC7.invert, 60, [[IC7.x, IC7.z], [4.7, tank.inletZ]]);
+export const TANK_MID = [(tank.x0 + tank.x1) / 2, (tank.z0 + tank.z1) / 2];
+const tankInlet = fall({ ...sewer, id: 'sewer-7-tank', name: 'Septic tank inlet', purpose: 'All sewage and wastewater enters the tank here through a dip tee.', from: 'IC-7', to: 'Septic tank' }, IC7.invert, 60, [[IC7.x, IC7.z], tank.inlet]);
 tank.inletInv = tankInlet;
 tank.liquid = r3(tankInlet - 0.075); // outlet invert sits 75 mm below the inlet
 tank.floor = r3(tank.liquid - 1.0);
 structures.push({
   id: 'Septic tank', kind: 'septic', layer: 'sewage', ...tank,
   name: 'Septic tank',
-  purpose: 'Two-compartment tank. Solids settle and digest in the first compartment; clearer water passes the baffle wall to the second and out to the soak pit.',
+  purpose: 'Two-compartment tank. Solids settle and digest in the first compartment; clearer water passes the baffle wall to the second and out through the outlet chamber.',
   details: [
     ['Inside size', '2.0 m long × 0.9 m wide'],
     ['Liquid depth', '1.0 m (about 1,800 litres)'],
@@ -137,26 +141,15 @@ structures.push({
     ['Access', 'Two cover slabs at ground level, one per compartment'],
     ['Vent', '75 mm, taken up the north wall to 2 m above the roof'],
     ['Cleaning', 'Desludge about every 2 years; reachable by hose from the west road'],
+    ['Position', 'North-west of the north yard: 4.5 m from the house, 0.5 m inside the north boundary'],
     ['Sizing basis', 'IS 2470 Part 1, up to about 10 users'],
   ],
 });
-labels.push({ text: 'Septic tank', layer: 'sewage', at: [4.7, 0.4, -4.58] });
+labels.push({ text: 'Septic tank', layer: 'sewage', at: [TANK_MID[0], 0.4, TANK_MID[1]] });
 
-const pit = { x: 1.6, z: -5.2, r: 0.75, bottom: -3.2 };
-fall({ ...sewer, id: 'tank-pit', name: 'Septic tank outlet', purpose: 'Settled water from the second compartment to the soak pit.', from: 'Septic tank', to: 'Soak pit' }, tank.liquid, 60, [[tank.outletX, tank.outletZ], [pit.x + pit.r, pit.z]]);
-structures.push({
-  id: 'Soak pit', kind: 'soakpit', layer: 'sewage', ...pit,
-  name: 'Soak pit',
-  purpose: 'Final disposal: settled water from the septic tank soaks into the ground through open-jointed brick lining.',
-  details: [
-    ['Size', '1.5 m across, about 2.1 m deep below the inlet'],
-    ['Lining', 'Honeycomb brickwork, filled with broken brick 40–80 mm'],
-    ['Cover', 'Concrete slab with an access cover'],
-    ['Clearances', '4.4 m from the house; about 14.6 m from the borewell, which is less than the 18 m usually asked for from a drinking-water source'],
-    ['Approval', 'Needs a soil percolation test and local authority approval; use a dispersion trench or a sewer connection where the ground does not drain'],
-  ],
-});
-labels.push({ text: 'Soak pit', layer: 'sewage', at: [pit.x, 0.4, pit.z] });
+const OUT = chamber({ id: 'Outlet', kind: 'ic', layer: 'sewage', x: -0.6, z: -5.2, size: 0.45, invert: r3(tank.liquid - 0.02), name: 'Outlet chamber', purpose: 'Last chamber on the plot, by the west boundary. The settled water from the septic tank needs an approved place to go from here: there is no soak pit, so this is where a public sewer connection (or another approved disposal) must be made.', to: 'Public sewer or other approved disposal (to be confirmed)' });
+fall({ ...sewer, id: 'tank-out', name: 'Septic tank outlet', purpose: 'Settled water from the second compartment to the outlet chamber.', from: 'Septic tank', to: 'Outlet' }, tank.liquid, 60, [tank.outlet, [OUT.x, OUT.z]]);
+fall({ ...sewer, id: 'out-boundary', name: 'Outlet to the boundary', purpose: 'Stub to the west boundary for the connection to a public sewer or other approved disposal. Its destination is not decided yet.', from: 'Outlet', to: 'Public sewer or other approved disposal (to be confirmed)' }, OUT.invert, 60, [[OUT.x, OUT.z], [-1.45, -5.2]]);
 
 // --- fixture tags
 for (const [text, layer, x, y, z] of [
@@ -166,25 +159,24 @@ for (const [text, layer, x, y, z] of [
   ['Basin', 'waste', 1.85, 1.05, 5.35],
   ['Floor drain', 'waste', 0.4, 0.2, 4.6],
   ['Floor drain', 'waste', 0.4, 0.2, 6.3],
-  ['Kitchen sink', 'waste', 7.55, 1.15, 8.5],
+  ['Kitchen sink', 'waste', 7.55, 1.15, 8.2],
 ]) labels.push({ text, layer, at: [x, y, z], small: true });
 
 // ===================================================================== vents
 
 pipe({ id: 'vent-soil', layer: 'vent', name: 'Soil vent pipe', purpose: 'Lets sewer gas out above the roof and stops the toilets’ water seals being sucked out. Fresh air only; no water flows in it.', dia: 75, material: SWR, from: 'Head of the drain at IC-1', to: 'Open air, 0.9 m above the roof' }, [[IC1.x + 0.3, -0.4, 5.09], [-0.1, -0.4, 5.09], [-0.1, ROOF + 0.9, 5.09]]);
-pipe({ id: 'vent-septic', layer: 'vent', name: 'Septic tank vent pipe', purpose: 'Releases gas from the septic tank well above head height and away from windows.', dia: 75, material: SWR, from: 'Septic tank', to: 'Open air, 2 m above the roof' }, [[4.3, -0.14, -3.5], [4.0, -0.14, -3.25], [4.0, -0.14, -0.1], [4.0, ROOF + 2.0, -0.1]]);
+pipe({ id: 'vent-septic', layer: 'vent', name: 'Septic tank vent pipe', purpose: 'Releases gas from the septic tank well above head height and away from windows.', dia: 75, material: SWR, from: 'Septic tank', to: 'Open air, 2 m above the roof' }, [[2.7, -0.14, -4.6], [4.0, -0.14, -4.0], [4.0, -0.14, -0.1], [4.0, ROOF + 2.0, -0.1]]);
 
 // ===================================================================== rainwater (never joins the sewage system)
 
 const RW = (id, x, z, invert, purpose, to) => chamber({ id, kind: 'rain', layer: 'rain', x, z, size: 0.45, invert, name: `Rainwater chamber ${id}`, purpose, to });
 const RW1 = RW('RW-1', -0.45, 11.65, -0.3, 'Foot of the south-west downpipe.', 'RW-2');
 const RW2 = RW('RW-2', 8.5, 11.65, -0.39, 'Foot of the south-east downpipe.', 'RW-3');
-const RW3 = RW('RW-3', 10.0, 11.65, -0.41, 'South-east corner, turn north.', 'RW-4');
 const RW5 = RW('RW-5', 3.5, -2.2, -0.4, 'Foot of the north downpipe by the staircase.', 'RW-6');
 const RW6 = RW('RW-6', 7.9, -2.2, -0.45, 'Foot of the north-east downpipe.', 'RW-7');
 const RW7 = RW('RW-7', 10.0, -2.2, -0.47, 'North-east corner, turn south. The line passes above the sewer here; they do not connect.', 'RW-4');
-const RW4 = RW('RW-4', 10.0, 4.2, -0.54, 'North and south rainwater lines meet and turn east.', 'Filter chamber');
-const FC = chamber({ id: 'Filter', kind: 'filter', layer: 'rain', x: 14.4, z: 4.2, size: 0.6, invert: -0.6, name: 'First-flush and filter chamber', purpose: 'Diverts the first dirty roof wash and strains leaves and silt before the recharge pit. Clean before the monsoon.', to: 'Recharge pit' });
+const RW4 = RW('RW-4', 10.0, 4.2, -0.54, 'Chamber part-way down the east rainwater line.', 'RW-3');
+const RW3 = RW('RW-3', 10.0, 11.65, -0.62, 'South-east corner by the gate: the south and east rainwater lines meet here and leave the plot.', 'Roadside storm drain');
 for (const [id, x, z, text] of [['YG-1', 10.0, 8.0, 'East yard'], ['YG-2', 10.0, 0.6, 'Outside the Hall east door'], ['YG-3', 5.7, -2.2, 'North yard']]) {
   chamber({ id, kind: 'yard', layer: 'rain', x, z, size: 0.3, invert: -0.45, name: `Yard gully ${id}`, purpose: `${text}: grated surface-water inlet. Paving and ground fall toward it at about 1 in 100.`, to: 'Rainwater line' });
 }
@@ -202,29 +194,13 @@ for (const [id, where, x, z, c] of [
 const rainRun = (id, name, a, b, dia = 110) => fall({ ...rainPipe, dia, id, name, purpose: 'Underground rainwater line, separate from all sewage and wastewater pipes.', from: a.id, to: b.id }, a.invert, 100, [[a.x, a.z], [b.x, b.z]]);
 rainRun('rain-1-2', 'South rainwater line RW-1 to RW-2', RW1, RW2);
 rainRun('rain-2-3', 'South rainwater line RW-2 to RW-3', RW2, RW3);
-rainRun('rain-3-4', 'East rainwater line RW-3 to RW-4', RW3, RW4);
 rainRun('rain-5-6', 'North rainwater line RW-5 to RW-6', RW5, RW6);
 rainRun('rain-6-7', 'North rainwater line RW-6 to RW-7', RW6, RW7);
 rainRun('rain-7-4', 'East rainwater line RW-7 to RW-4', RW7, RW4);
-rainRun('rain-4-f', 'Rainwater collector to the filter', RW4, FC, 160);
-
-const recharge = { x: 15.8, z: 4.2, r: 0.6, bottom: -2.6 };
-fall({ ...rainPipe, dia: 160, id: 'rain-f-pit', name: 'Filter outlet', purpose: 'Filtered rainwater into the recharge pit.', from: 'Filter', to: 'Recharge pit' }, FC.invert, 100, [[FC.x, FC.z], [recharge.x - recharge.r, recharge.z]]);
-fall({ ...rainPipe, id: 'rain-overflow', name: 'Recharge pit overflow', purpose: 'In very heavy rain the surplus overflows to the roadside storm drain, never to the sewer.', from: 'Recharge pit', to: 'Roadside storm drain' }, -0.45, 100, [[recharge.x, recharge.z + recharge.r], [15.8, 11.95]]);
-structures.push({
-  id: 'Recharge pit', kind: 'recharge', layer: 'rain', ...recharge,
-  name: 'Rainwater recharge pit',
-  purpose: 'Roof and yard rainwater soaks back into the ground here to recharge groundwater.',
-  details: [
-    ['Size', '1.2 m across, 2.5 m deep'],
-    ['Filter layers', 'Coarse sand over gravel over boulders'],
-    ['Recharge bore', '150 mm slotted pipe below the pit'],
-    ['Catchment', 'About 86 m² of roof through four 110 mm downpipes, plus three yard gullies'],
-    ['Overflow', 'To the roadside storm drain'],
-    ['Separation', 'No connection to any sewage or wastewater pipe'],
-  ],
-});
-labels.push({ text: 'Recharge pit', layer: 'rain', at: [recharge.x, 0.4, recharge.z] });
+rainRun('rain-4-3', 'East rainwater line RW-4 to RW-3', RW4, RW3, 160);
+// There is no recharge pit: all roof and yard rainwater leaves to the roadside storm drain.
+fall({ ...rainPipe, dia: 160, id: 'rain-out', name: 'Rainwater outlet', purpose: 'All roof and yard rainwater leaves the plot here to the roadside storm drain on the main road. It never joins the sewage pipes.', from: 'RW-3', to: 'Roadside storm drain' }, RW3.invert, 100, [[RW3.x, RW3.z], [10.0, 12.35]]);
+labels.push({ text: 'To storm drain', layer: 'rain', at: [10.0, 0.2, 12.35], small: true });
 
 // Roof edge, roof outlets and the direction rain runs on the roof and yard.
 export const roofOutline = { x0: 0, z0: 0, x1: 8.0772, z1: 10.668, y: ROOF };
@@ -250,11 +226,10 @@ export const surfaceFlows = [
 const borewell = { x: 16.2, z: -5.4 };
 const sump = { x0: 13.4, x1: 15.2, z0: -5.7, z1: -3.9, wall: 0.15, floor: -1.8, water: -0.4 };
 const pump = { x: 14.3, z: -3.45 };
-const oht = { x: 7.0, z: 9.6, r: 0.55, base: ROOF + 0.45, top: ROOF + 1.7 };
+const oht = { x: 0.9, z: 0.9, r: 0.55, base: ROOF + 0.45, top: ROOF + 1.7 }; // north-west corner of the roof
 const sumpMid = [(sump.x0 + sump.x1) / 2, (sump.z0 + sump.z1) / 2];
 const metres = (a, b) => Math.round(Math.hypot(a[0] - b[0], a[1] - b[1]) * 10) / 10;
-const boreToPit = metres([borewell.x, borewell.z], [pit.x, pit.z]);
-const boreToTank = metres([borewell.x, borewell.z], [4.7, -4.58]);
+const boreToTank = metres([borewell.x, borewell.z], TANK_MID);
 
 structures.push({
   id: 'Borewell', kind: 'borewell', layer: 'fresh', ...borewell,
@@ -264,8 +239,7 @@ structures.push({
     ['Casing', '150 mm, sealed at the top above yard level'],
     ['Pump', 'Existing borewell pump; a float switch in the sump stops it when the sump is full'],
     ['Delivery', '32 mm pipe to the sump'],
-    ['Distance to soak pit', `About ${boreToPit} m. 18 m is the usual minimum between a soak pit and a drinking-water source, so this needs an engineer’s decision`],
-    ['Distance to septic tank', `About ${boreToTank} m`],
+    ['Distance to septic tank', `About ${boreToTank} m. The tank is watertight, but an engineer should confirm this separation from a drinking-water source`],
   ],
 });
 labels.push({ text: 'Borewell', layer: 'fresh', at: [borewell.x, 0.75, borewell.z] });
@@ -281,17 +255,17 @@ structures.push({
   details: [
     ['Capacity', 'About 3,000 litres (1.5 × 1.5 × 1.4 m of water)'],
     ['Construction', 'Watertight concrete, cover raised above the yard so surface water cannot enter'],
-    ['Position', `Beside the borewell in the north-east corner; about ${metres(sumpMid, [pit.x, pit.z])} m from the soak pit and ${metres(sumpMid, [4.7, -4.58])} m from the septic tank`],
+    ['Position', `Beside the borewell in the north-east corner; about ${metres(sumpMid, TANK_MID)} m from the septic tank`],
   ],
 });
 labels.push({ text: 'Sump', layer: 'fresh', at: [sumpMid[0], 0.45, sumpMid[1]] });
 structures.push({ id: 'Pump', kind: 'pump', layer: 'fresh', ...pump, name: 'Water pump', purpose: 'Lifts water from the sump to the overhead tank.', details: [['Type', 'About 0.5 hp self-priming pump on a raised plinth, beside the sump and borewell'], ['Suction', '25 mm with a foot valve in the sump'], ['Delivery', '25 mm rising main to the roof tank']] });
 labels.push({ text: 'Pump', layer: 'fresh', at: [pump.x, 0.75, pump.z] });
-structures.push({ id: 'Overhead tank', kind: 'oht', layer: 'fresh', ...oht, name: 'Overhead water tank', purpose: 'Feeds every tap in the house by gravity.', details: [['Capacity', '1,000 litres'], ['Position', 'On the roof above the kitchen, on a 0.45 m stand'], ['Inlet', '25 mm rising main with a float valve'], ['Outlet', '32 mm main with a shut-off valve']] });
+structures.push({ id: 'Overhead tank', kind: 'oht', layer: 'fresh', ...oht, name: 'Overhead water tank', purpose: 'Feeds every tap in the house by gravity.', details: [['Capacity', '1,000 litres'], ['Position', 'On the roof at the north-west corner, above the C. Bed Room, on a 0.45 m stand'], ['Inlet', '25 mm rising main with a float valve'], ['Outlet', '32 mm main with a shut-off valve']] });
 labels.push({ text: 'Overhead tank', layer: 'fresh', at: [oht.x, oht.top + 0.3, oht.z] });
 
 pipe({ id: 'suction', layer: 'fresh', name: 'Pump suction', purpose: 'Draws water from near the bottom of the sump.', dia: 25, material: UPVC, from: 'Sump', to: 'Pump' }, [[pump.x, -1.6, sump.z1 - 0.4], [pump.x, 0.25, sump.z1 - 0.4], [pump.x, 0.25, pump.z - 0.1]]);
-pipe({ id: 'rising', layer: 'fresh', name: 'Rising main', purpose: 'Pumped water from the sump to the overhead tank: underground across the north yard, up the east wall at the north-east corner of the house, then along the roof. Where it crosses the east drain and rainwater line it passes above them in a sleeve.', dia: 25, material: UPVC, from: 'Pump', to: 'Overhead tank' }, [[pump.x, 0.25, pump.z + 0.1], [pump.x, -0.25, pump.z + 0.1], [pump.x, -0.25, -1.2], [8.2, -0.25, -1.2], [8.2, -0.25, 0.5], [8.2, ROOF + 0.2, 0.5], [7.6, ROOF + 0.2, 0.9], [7.6, ROOF + 0.2, 9.75], [7.45, ROOF + 0.2, 9.9], [7.45, oht.top - 0.1, 9.9]]);
+pipe({ id: 'rising', layer: 'fresh', name: 'Rising main', purpose: 'Pumped water from the sump to the overhead tank: underground across the north yard, up the east wall at the north-east corner of the house, then west along the roof to the tank. Where it crosses the east drain and rainwater line it passes above them in a sleeve.', dia: 25, material: UPVC, from: 'Pump', to: 'Overhead tank' }, [[pump.x, 0.25, pump.z + 0.1], [pump.x, -0.25, pump.z + 0.1], [pump.x, -0.25, -1.2], [8.2, -0.25, -1.2], [8.2, -0.25, 0.5], [8.2, ROOF + 0.2, 0.5], [7.6, ROOF + 0.2, 0.9], [1.7, ROOF + 0.2, 0.9], [oht.x + 0.45, ROOF + 0.2, oht.z + 0.3], [oht.x + 0.45, oht.top - 0.1, oht.z + 0.3]]);
 
 const cold = (id, name, purpose, dia, from, to, pts) => pipe({ id, layer: 'fresh', name, purpose, dia, material: UPVC, from, to }, pts);
 const hot = (id, name, purpose, from, to, pts) => pipe({ id, layer: 'fresh', hot: true, name, purpose, dia: 15, material: CPVC, from, to }, pts);
@@ -299,8 +273,9 @@ const RY = ROOF + 0.08; // pipes lying on the roof slab
 const HI = 2.35; // cold pipe along the bathroom walls, above the tiles
 const HH = 2.22; // hot pipe just below it
 
-// main from the tank, across the roof to above the two bathrooms
-cold('main', 'Main distribution pipe', 'Cold water from the overhead tank across the roof to the bathrooms.', 32, 'Overhead tank', 'Bathroom branches', [[7.0, oht.base + 0.05, 9.05], [7.0, RY, 9.05], [4.25, RY, 9.05], [4.25, RY, 5.09], [2.3, RY, 5.09]]);
+// main from the tank, along the roof to above the two bathrooms, then on to the kitchen side
+cold('main', 'Main distribution pipe', 'Cold water from the overhead tank along the roof to the bathrooms.', 32, 'Overhead tank', 'Bathroom branches', [[oht.x, oht.base + 0.05, oht.z + 0.55], [oht.x, RY, oht.z + 0.55], [2.3, RY, oht.z + 0.55], [2.3, RY, 5.09]]);
+cold('main-kitchen', 'Kitchen-side distribution pipe', 'Continues the main across the roof from above the bathrooms to above the kitchen, for the sink, wash area and utility taps.', 25, 'Main distribution pipe', 'Kitchen, wash area and utility branches', [[2.3, RY, 5.09], [4.25, RY, 5.09], [4.25, RY, 9.05], [7.0, RY, 9.05]]);
 
 // Toilet 1 (second bedroom side): its own branch and shut-off
 cold('t1-branch', 'Toilet 1 cold branch', 'Separate cold supply to Toilet 1, with its own shut-off valve, run along the walls above the tiles.', 20, 'Main distribution pipe', 'Toilet 1 fixtures', [[2.3, RY, 5.09], [2.25, RY, 4.985], [2.25, HI, 4.985], [0.27, HI, 4.985], [0.27, HI, 3.85], [0.6, HI, 3.85]]);
@@ -321,9 +296,9 @@ hot('t2-hot-shower', 'Toilet 2 shower, hot', 'Hot water from the geyser to the s
 hot('t2-hot-basin', 'Toilet 2 basin, hot', 'Hot water from the geyser to the washbasin.', 'Geyser', 'Basin', [[0.54, HH, 5.23], [1.91, HH, 5.23], [1.91, 0.6, 5.23]]);
 
 // kitchen sink, wash area, utility
-cold('kitchen', 'Kitchen sink supply', 'Cold water down the east wall, behind the counter, to the sink tap.', 20, 'Overhead tank', 'Kitchen sink', [[7.0, RY, 9.05], [7.0, RY, 7.72], [7.8, RY, 7.72], [7.8, 0.6, 7.72], [7.8, 0.6, 8.5], [7.8, 0.92, 8.5]]);
-cold('wash', 'Kitchen wash area supply', 'Cold water down the outside of the east wall to the wash area tap.', 15, 'Overhead tank', 'Wash area tap', [[7.0, RY, 9.05], [7.0, RY, 9.5], [8.16, RY, 9.5], [8.16, 0.9, 9.5], [8.3, 0.9, 9.5]]);
-cold('utility', 'Utility / washing area supply', 'Cold water down the outside of the south wall to the washing-machine tap.', 15, 'Overhead tank', 'Utility tap', [[7.0, RY, 9.5], [7.0, RY, 10.2], [7.75, RY, 10.74], [7.75, 0.9, 10.74], [7.75, 0.9, 10.88]]);
+cold('kitchen', 'Kitchen sink supply', 'Cold water down the east wall, behind the counter, to the sink tap.', 20, 'Kitchen-side distribution pipe', 'Kitchen sink', [[7.0, RY, 9.05], [7.0, RY, 7.72], [7.8, RY, 7.72], [7.8, 0.6, 7.72], [7.8, 0.6, 8.2], [7.8, 0.92, 8.2]]);
+cold('wash', 'Kitchen wash area supply', 'Cold water down the outside of the east wall to the wash area tap.', 15, 'Kitchen-side distribution pipe', 'Wash area tap', [[7.0, RY, 9.05], [7.0, RY, 9.5], [8.16, RY, 9.5], [8.16, 0.9, 9.5], [8.3, 0.9, 9.5]]);
+cold('utility', 'Utility / washing area supply', 'Cold water down the outside of the south wall to the washing-machine tap.', 15, 'Kitchen-side distribution pipe', 'Utility tap', [[7.0, RY, 9.5], [7.0, RY, 10.2], [7.75, RY, 10.74], [7.75, 0.9, 10.74], [7.75, 0.9, 10.88]]);
 
 for (const [text, x, y, z] of [['Wash area tap', 8.3, 1.15, 9.5], ['Utility tap', 7.75, 1.15, 10.9], ['Geyser', 0.62, 2.45, 4.85], ['Geyser', 0.55, 2.45, 6.49]]) {
   labels.push({ text, layer: 'fresh', at: [x, y, z], small: true });

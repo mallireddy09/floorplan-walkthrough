@@ -37,7 +37,7 @@ The "Plumbing & Drainage" button opens a separate inspection view. The house tur
 - Drag to rotate, scroll or pinch to zoom, right-drag to move. Click any pipe, chamber or tank for its purpose, size, fall, depth and where it flows.
 - "Section" cuts the model along an east-west line and shows the ground in section with a depth scale; the slider moves the cut north or south.
 
-The layout lives in `src/plumbing/design.js` (routes, sizes, falls, chambers, tanks), is drawn by `src/plumbing/build.js`, and the view itself is `src/plumbing/mode.js`. It follows common Indian practice (National Building Code Part 9, IS 1742, IS 2470, IS 2065) as a design-intent layout for visualisation. It is not an approved drawing: pipe sizes, the septic tank and the soak pit need checking by a licensed plumbing engineer against site conditions and local rules.
+The layout lives in `src/plumbing/design.js` (routes, sizes, falls, chambers, tanks), is drawn by `src/plumbing/build.js`, and the view itself is `src/plumbing/mode.js`. It follows common Indian practice (National Building Code Part 9, IS 1742, IS 2470, IS 2065) as a design-intent layout for visualisation. It is not an approved drawing: pipe sizes, the septic tank and where its outlet and the rainwater discharge go need checking by a licensed plumbing engineer against site conditions and local rules.
 
 ## How it is put together
 

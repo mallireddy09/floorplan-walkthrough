@@ -344,10 +344,11 @@ function masterBedroom(at, b, M) {
 function kitchen(at, b, M, colliders) {
   const x0 = 7.2486; // front of the east run
   const x1 = 7.8486; // east wall
-  const zN = 7.52; // north end of the counter (the fridge sits north of it)
+  const zN = 7.52; // north end of the counter; the corner between it and the Pooja wall is left empty
   const zS = 10.4394; // south wall
-  const sink0 = 8.2;
-  const sink1 = 8.8;
+  const sink0 = 7.9;
+  const sink1 = 8.5;
+  const sinkMid = (sink0 + sink1) / 2;
 
   // base cabinets along the east wall, split around the sink bowl
   b.box(M.dark, x0 + 0.06, 0, zN, x1, 0.1, zS);
@@ -377,8 +378,8 @@ function kitchen(at, b, M, colliders) {
   b.box(M.steel, x1 - 0.11, 0.64, sink0, x1 - 0.1, 0.862, sink1);
   b.box(M.steel, x0 + 0.1, 0.64, sink0, x1 - 0.1, 0.862, sink0 + 0.01);
   b.box(M.steel, x0 + 0.1, 0.64, sink1 - 0.01, x1 - 0.1, 0.862, sink1);
-  b.cyl(M.steel, x1 - 0.05, 0.86, 8.5, 0.015, 0.28);
-  b.box(M.steel, x1 - 0.22, 1.12, 8.488, x1 - 0.04, 1.14, 8.512);
+  b.cyl(M.steel, x1 - 0.05, 0.86, sinkMid, 0.015, 0.28);
+  b.box(M.steel, x1 - 0.22, 1.12, sinkMid - 0.012, x1 - 0.04, 1.14, sinkMid + 0.012);
 
   // hob at the south-east end, chimney on the solid wall above it
   b.box(M.blackGlass, x0 + 0.08, 0.86, 9.42, x1 - 0.08, 0.872, 10.02);
@@ -399,8 +400,8 @@ function kitchen(at, b, M, colliders) {
   colliders.push({ x0: x0 - 0.02, z0: zN, x1, z1: zS, tag: 'kitchen counter' });
   colliders.push({ x0: 6.0, z0: zS - 0.6, x1: x0, z1: zS, tag: 'kitchen counter' });
 
-  // fridge in the north-east corner, facing west
-  const f = at(7.49, 7.15, 'w');
+  // fridge on the centre wall, right beside the microwave, facing east
+  const f = at(4.665, 8.87, 'e');
   f.box(M.dark, -0.33, 0, -0.33, 0.33, 0.03, 0.3);
   f.box(M.fridge, -0.35, 0.03, -0.35, 0.35, 1.75, 0.35);
   f.box(M.dark, -0.35, 1.12, 0.35, 0.35, 1.128, 0.353);
@@ -409,7 +410,7 @@ function kitchen(at, b, M, colliders) {
   f.solid(-0.35, -0.35, 0.35, 0.35, 'fridge');
 
   // storage unit with a microwave on the centre wall
-  const s = at(4.515, 8.4, 'e');
+  const s = at(4.515, 7.7, 'e');
   s.box(M.dark, -0.78, 0, -0.2, 0.78, 0.1, 0.16);
   s.box(M.laminate, -0.8, 0.1, -0.2, 0.8, 0.82, 0.2);
   s.box(M.oak, -0.82, 0.82, -0.2, 0.82, 0.86, 0.22);

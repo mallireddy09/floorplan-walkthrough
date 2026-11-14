@@ -101,9 +101,6 @@ export function buildPlumbing({ compact = false } = {}) {
   const waterMat = new THREE.MeshLambertMaterial({ color: 0x4f9be8, transparent: true, opacity: 0.4, depthWrite: false });
   const sewageMat = new THREE.MeshLambertMaterial({ color: 0x8a7a55, transparent: true, opacity: 0.45, depthWrite: false });
   const sludgeMat = new THREE.MeshLambertMaterial({ color: 0x4f432c, transparent: true, opacity: 0.7, depthWrite: false });
-  const gravelMat = new THREE.MeshLambertMaterial({ color: 0xa79c8a, transparent: true, opacity: 0.55, depthWrite: false });
-  const sandMat = new THREE.MeshLambertMaterial({ color: 0xd9c48f, transparent: true, opacity: 0.6, depthWrite: false });
-  const boulderMat = new THREE.MeshLambertMaterial({ color: 0x8b8f93, transparent: true, opacity: 0.6, depthWrite: false });
 
   const add = (layer, mesh, info) => {
     layers[layer].add(mesh);
@@ -173,44 +170,29 @@ export function buildPlumbing({ compact = false } = {}) {
     const top = design.ground;
 
     if (s.kind === 'septic') {
+      // The tank lies east-west: inlet at the east end, outlet at the west end.
       const ix0 = s.x0 + s.wall;
       const ix1 = s.x1 - s.wall;
       const iz0 = s.z0 + s.wall;
       const iz1 = s.z1 - s.wall;
+      const mz = (s.z0 + s.z1) / 2;
       g.add(new THREE.Mesh(box(s.x0, s.floor - 0.15, s.z0, s.x1, top - 0.12, s.z1), shell)); // walls
       g.add(new THREE.Mesh(box(s.x0, s.floor - 0.15, s.z0, s.x1, s.floor, s.z1), concrete)); // floor slab
       g.add(new THREE.Mesh(box(ix0, s.floor, iz0, ix1, s.floor + 0.25, iz1), sludgeMat)); // settled sludge
       g.add(new THREE.Mesh(box(ix0, s.floor + 0.25, iz0, ix1, s.liquid, iz1), sewageMat)); // liquid
-      // baffle wall two-thirds of the way along, with a submerged opening
-      const bz = iz1 - (iz1 - iz0) * (2 / 3);
-      g.add(new THREE.Mesh(box(ix0, s.floor, bz - 0.06, ix1, s.liquid - 0.6, bz + 0.06), concrete));
-      g.add(new THREE.Mesh(box(ix0, s.liquid - 0.35, bz - 0.06, ix1, s.liquid + 0.2, bz + 0.06), concrete));
+      // baffle wall two-thirds of the way along from the inlet, with a submerged opening
+      const bx = ix1 - (ix1 - ix0) * (2 / 3);
+      g.add(new THREE.Mesh(box(bx - 0.06, s.floor, iz0, bx + 0.06, s.liquid - 0.6, iz1), concrete));
+      g.add(new THREE.Mesh(box(bx - 0.06, s.liquid - 0.35, iz0, bx + 0.06, s.liquid + 0.2, iz1), concrete));
       // inlet and outlet dip tees
-      g.add(new THREE.Mesh(tube([[4.7, s.inletInv + 0.25, iz1 - 0.1], [4.7, s.liquid - 0.35, iz1 - 0.1]], 0.055), pipeMat.sewage));
-      g.add(new THREE.Mesh(tube([[ix0 + 0.1, s.liquid + 0.2, s.outletZ], [ix0 + 0.1, s.liquid - 0.35, s.outletZ]], 0.055), pipeMat.sewage));
-      // top slab and the two access covers
+      g.add(new THREE.Mesh(tube([[ix1 - 0.1, s.inletInv + 0.25, mz], [ix1 - 0.1, s.liquid - 0.35, mz]], 0.055), pipeMat.sewage));
+      g.add(new THREE.Mesh(tube([[ix0 + 0.1, s.liquid + 0.2, mz], [ix0 + 0.1, s.liquid - 0.35, mz]], 0.055), pipeMat.sewage));
+      // top slab and the two access covers, one over each compartment
       g.add(new THREE.Mesh(box(s.x0, top - 0.12, s.z0, s.x1, top, s.z1), shell));
-      for (const z of [iz1 - 0.45, iz0 + 0.4]) {
-        g.add(new THREE.Mesh(box(4.4, top, z - 0.3, 5.0, top + 0.05, z + 0.3), cover));
-        g.add(new THREE.Mesh(box(4.52, top + 0.05, z - 0.18, 4.88, top + 0.06, z + 0.18), pipeMat.sewage));
+      for (const x of [ix1 - 0.45, ix0 + 0.4]) {
+        g.add(new THREE.Mesh(box(x - 0.3, top, mz - 0.3, x + 0.3, top + 0.05, mz + 0.3), cover));
+        g.add(new THREE.Mesh(box(x - 0.18, top + 0.05, mz - 0.18, x + 0.18, top + 0.06, mz + 0.18), pipeMat.sewage));
       }
-    } else if (s.kind === 'soakpit') {
-      g.add(new THREE.Mesh(cyl(s.x, s.bottom, s.z, s.r + 0.115, top - 0.12 - s.bottom), shell));
-      g.add(new THREE.Mesh(cyl(s.x, s.bottom, s.z, s.r, 1.9), gravelMat)); // broken-brick fill
-      for (let y = s.bottom + 0.3; y < -1.0; y += 0.35) {
-        g.add(new THREE.Mesh(new THREE.TorusGeometry(s.r + 0.115, 0.018, 6, 40).rotateX(Math.PI / 2).translate(s.x, y, s.z), concrete)); // honeycomb courses
-      }
-      g.add(new THREE.Mesh(cyl(s.x, top - 0.12, s.z, s.r + 0.115, 0.12), shell));
-      g.add(new THREE.Mesh(cyl(s.x, top, s.z, 0.3, 0.05), cover));
-    } else if (s.kind === 'recharge') {
-      const h = top - 0.12 - s.bottom;
-      g.add(new THREE.Mesh(cyl(s.x, s.bottom, s.z, s.r + 0.115, h), shell));
-      g.add(new THREE.Mesh(cyl(s.x, s.bottom, s.z, s.r, 0.9), boulderMat));
-      g.add(new THREE.Mesh(cyl(s.x, s.bottom + 0.9, s.z, s.r, 0.6), gravelMat));
-      g.add(new THREE.Mesh(cyl(s.x, s.bottom + 1.5, s.z, s.r, 0.4), sandMat));
-      g.add(new THREE.Mesh(tube([[s.x, s.bottom + 0.2, s.z], [s.x, s.bottom - 2.2, s.z]], 0.075), pipeMat.rain)); // recharge bore
-      g.add(new THREE.Mesh(cyl(s.x, top - 0.12, s.z, s.r + 0.115, 0.12), shell));
-      g.add(new THREE.Mesh(cyl(s.x, top, s.z, 0.3, 0.05), darkMat.rain));
     } else if (s.kind === 'sump') {
       g.add(new THREE.Mesh(box(s.x0, s.floor - 0.15, s.z0, s.x1, top - 0.12, s.z1), shell));
       g.add(new THREE.Mesh(box(s.x0, s.floor - 0.15, s.z0, s.x1, s.floor, s.z1), concrete));
