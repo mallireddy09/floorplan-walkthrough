@@ -356,6 +356,10 @@ wholeEl.addEventListener('click', () => {
 window.addEventListener('keydown', (e) => {
   if (e.code === 'Enter' && intro.active) enterHouse();
 });
+// The tour video and the wall photos are on a page of their own.
+document.getElementById('tour').addEventListener('click', () => {
+  window.location.href = 'tour/index.html';
+});
 
 const minimap = new MiniMap(document.getElementById('map'), plan);
 let lastRoom = '';

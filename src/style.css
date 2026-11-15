@@ -461,7 +461,8 @@ body.plumbing #stick,
 body.plumbing #style,
 body.plumbing #time,
 body.plumbing #toggle,
-body.plumbing #whole {
+body.plumbing #whole,
+body.plumbing #tour {
   display: none;
 }
 

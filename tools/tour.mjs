@@ -6,7 +6,9 @@
 //   node tools/tour.mjs stills     saves a sheet of stills from the finished video
 //   node tools/tour.mjs info       prints the graphics card in use and everything that blocks the walker
 //
-// Output goes to the "tour" folder. Needs two packages that are not in package.json:
+// The photos, the 720p video and the page that shows them go to public/tour, which is
+// published with the site. The 1080p video and the check sheets go to "tour", which is
+// not. Needs two packages that are not in package.json:
 //   npm install --no-save playwright-core mp4-muxer
 // and Google Chrome installed on this computer.
 
@@ -18,7 +20,8 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const plan = JSON.parse(await fs.readFile(path.join(root, 'src/data/plan.json'), 'utf8'));
-const outDir = path.join(root, 'tour');
+const siteDir = path.join(root, 'public', 'tour'); // published with the site: photos, the page that shows them, the 720p video
+const localDir = path.join(root, 'tour'); // stays on this computer: the 1080p video (too large for GitHub) and check sheets
 const mode = process.argv[2] ?? 'photos';
 const FPS = 30;
 
@@ -189,7 +192,7 @@ async function photos() {
   console.log('graphics:', gpu);
   const colliders = await page.evaluate(() => window.__walk.colliders.map((c) => ({ ...c })));
   const shots = [...wallShots(colliders), ...outsideShots()];
-  await fs.mkdir(path.join(outDir, 'walls'), { recursive: true });
+  await fs.mkdir(path.join(siteDir, 'walls'), { recursive: true });
   for (const s of shots) {
     if (only && !s.file.includes(only)) continue;
     const h = 750;
@@ -200,10 +203,10 @@ async function photos() {
       window.__walk.shot(cam);
       return document.getElementById('view').toDataURL('image/jpeg', 0.93);
     }, s.cam);
-    await saveDataUrl(path.join(outDir, 'walls', s.file), url);
+    await saveDataUrl(path.join(siteDir, 'walls', s.file), url);
     console.log(s.file, `${w * 2}x${h * 2}`, s.title, `fov ${s.cam.fov.toFixed(0)} near ${s.cam.near.toFixed(2)}`);
   }
-  if (!only) await fs.writeFile(path.join(outDir, 'index.html'), galleryPage(shots));
+  if (!only) await fs.writeFile(path.join(siteDir, 'index.html'), galleryPage(shots));
   await close();
 }
 
@@ -237,13 +240,16 @@ function galleryPage(shots) {
   img { width: 100%; display: block; }
   figcaption { padding: 8px 10px; font-size: 14px; }
   a { color: inherit; }
+  .back { margin: 0 0 14px; }
+  .back a { display: inline-block; padding: 9px 14px; border-radius: 10px; background: var(--card); color: var(--fg); font-weight: 600; text-decoration: none; }
 </style>
 </head>
 <body>
 <main>
+<p class="back"><a href="../index.html">Walk-through</a></p>
 <h1>House tour and wall photos</h1>
-<video controls preload="metadata" src="house-tour-1080p.mp4"></video>
-<p>Video files: <a href="house-tour-1080p.mp4">1080p</a> · <a href="house-tour-720p.mp4">720p</a>. Click a photo to open it full size.</p>
+<video controls playsinline preload="metadata" src="house-tour-720p.mp4"></video>
+<p><a href="house-tour-720p.mp4" download>Download the video</a>. Tap a photo to open it full size.</p>
 ${groups.map(section).join('\n')}
 </main>
 </body>
@@ -532,7 +538,7 @@ async function check() {
   const cols = await page.evaluate(() => window.__walk.colliders.map((c) => ({ ...c })));
   const hits = clearance(frames, cols);
   console.log(hits.length ? 'too close:\n  ' + hits.join('\n  ') : 'route is clear of walls and furniture');
-  await fs.mkdir(path.join(outDir, 'check'), { recursive: true });
+  await fs.mkdir(path.join(localDir, 'check'), { recursive: true });
   const picks = [];
   for (let i = 0; i < frames.length; i += Math.round(every * FPS)) picks.push(i);
   const { labels, data } = packFrames(frames);
@@ -563,7 +569,7 @@ async function check() {
       },
       { part, data, labels, COLS, ROWS, FPS },
     );
-    await saveDataUrl(path.join(outDir, 'check', `sheet-${s + 1}.jpg`), url);
+    await saveDataUrl(path.join(localDir, 'check', `sheet-${s + 1}.jpg`), url);
     console.log('saved', `sheet-${s + 1}.jpg`);
   }
   await close();
@@ -578,7 +584,8 @@ async function video() {
   console.log('graphics:', gpu);
   await page.addScriptTag({ path: path.join(root, 'node_modules/mp4-muxer/build/mp4-muxer.js') });
   const { labels, data } = packFrames(use);
-  await fs.mkdir(outDir, { recursive: true });
+  await fs.mkdir(siteDir, { recursive: true });
+  await fs.mkdir(localDir, { recursive: true });
 
   const started = Date.now();
   const result = await page.evaluate(
@@ -671,7 +678,7 @@ async function video() {
         { i, name: names[i] },
       ),
     ]);
-    const file = path.join(outDir, limit ? `trial-${names[i]}` : names[i]);
+    const file = limit ? path.join(localDir, `trial-${names[i]}`) : path.join(i === 0 ? localDir : siteDir, names[i]);
     await download.saveAs(file);
     console.log('saved', file);
   }
@@ -704,8 +711,8 @@ async function stills() {
     console.log(`[tour] ${src}: ${v.videoWidth}x${v.videoHeight}, ${v.duration.toFixed(1)} s`);
     return sheet.toDataURL('image/jpeg', 0.85);
   }, `/tour/${name}`);
-  await fs.mkdir(path.join(outDir, 'check'), { recursive: true });
-  await saveDataUrl(path.join(outDir, 'check', 'video-stills.jpg'), url);
+  await fs.mkdir(path.join(localDir, 'check'), { recursive: true });
+  await saveDataUrl(path.join(localDir, 'check', 'video-stills.jpg'), url);
   await close();
 }
 
