@@ -143,6 +143,8 @@ export function createLighting(scene, plan, { isTouch }) {
       }
       // Without shadows (phones) the window light is not held back by the walls, so it is turned down.
       light.intensity = outside && !roomShadows ? cfg[0] * 0.4 : cfg[0];
+      light.userData.full = light.intensity;
+      light.userData.window = !!outside;
       light.color.set(cfg[1]);
       light.castShadow = !!(roomShadows && def.shadow);
     }
@@ -162,5 +164,10 @@ export function createLighting(scene, plan, { isTouch }) {
     return { background: 0xeef1f4, exposure: 1.0 };
   }
 
-  return { apply, applyTechnical, sun, rooms };
+  /** Scales the daylight that stands in at the windows: 1 is the look's own strength. Used for pictures taken outdoors. */
+  function setWindowLight(k) {
+    for (const { light } of Object.values(rooms)) if (light.userData.window) light.intensity = light.userData.full * k;
+  }
+
+  return { apply, applyTechnical, setWindowLight, sun, rooms };
 }

@@ -28,6 +28,7 @@ export function createPost(renderer, scene, camera) {
     composer.addPass(bloom);
     composer.addPass(new OutputPass());
 
+    let glow = 0.14;
     return {
       render: () => composer.render(),
       setSize(w, h, pixelRatio) {
@@ -35,8 +36,13 @@ export function createPost(renderer, scene, camera) {
         composer.setSize(w, h);
       },
       setNight(night) {
-        bloom.strength = night ? 0.32 : 0.14;
+        glow = night ? 0.32 : 0.14;
+        bloom.strength = glow;
         bloom.threshold = night ? 1.0 : 1.3;
+      },
+      /** Scales the glow: 1 is the look's own strength. Used for pictures taken outdoors. */
+      setGlow(k) {
+        bloom.strength = glow * k;
       },
     };
   } catch (err) {

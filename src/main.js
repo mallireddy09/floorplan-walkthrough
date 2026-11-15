@@ -96,6 +96,7 @@ const worlds = {};
 const state = { style: 'model', night: false, top: false };
 let colliders = [];
 let needsRender = true;
+let lookExposure = 1;
 
 function ensureWorld(style) {
   if (!worlds[style]) {
@@ -116,6 +117,7 @@ function applyLook() {
   const real = state.style === 'real';
   const look = lighting.apply(state.style, state.night, real && !isTouch);
   renderer.toneMappingExposure = look.exposure;
+  lookExposure = look.exposure;
   if (real) {
     const key = state.night ? 'night' : 'day';
     skies[key] ??= skyTexture(state.night);
@@ -512,6 +514,23 @@ window.__walk = {
   lighting,
   plumbing,
   step: tick,
+  /**
+   * Draws one frame from any viewpoint. The wall photos and the tour video are made with this (tools/tour.mjs).
+   * outdoor (0 to 1) sets the picture up for sunlight, as a camera would: lower exposure, less glow, and the
+   * stand-in daylight at the windows switched off so it does not show on the outside walls.
+   */
+  shot({ x, y = EYE, z, heading = 0, pitch = 0, fov = 65, near = 0.05, outdoor = 0 }) {
+    camera.position.set(x, y, z);
+    camera.rotation.set(THREE.MathUtils.degToRad(pitch), -THREE.MathUtils.degToRad(heading), 0);
+    camera.fov = fov;
+    camera.near = near;
+    camera.updateProjectionMatrix();
+    renderer.toneMappingExposure = lookExposure * (1 - 0.42 * outdoor);
+    post?.setGlow(1 - 0.75 * outdoor);
+    lighting.setWindowLight(1 - outdoor);
+    if (post && state.style === 'real') post.render();
+    else renderer.render(scene, camera);
+  },
   renderNow() {
     syncView();
     draw();
