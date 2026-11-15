@@ -226,6 +226,7 @@ function galleryPage(shots) {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>House tour and wall photos</title>
+<link rel="icon" href="data:,">
 <style>
   :root { color-scheme: light dark; --bg: #f4f2ee; --fg: #1c1e21; --muted: #5f646b; --card: #fff; }
   @media (prefers-color-scheme: dark) { :root { --bg: #17191c; --fg: #eceae6; --muted: #a2a7ae; --card: #22252a; } }
